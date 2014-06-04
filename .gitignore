@@ -1,0 +1,7 @@
+*.exe
+*.out
+*.stackdump
+*.gz
+*.gexf
+threadpool.hpp
+threadpool/
