@@ -107,11 +107,13 @@ vector<D_alpha> performMatching(vector<D_alpha>& matches){
   ssize_t** res = kuhn_match(mat, matrix.size(), maxwidth);
   vector<D_alpha> ans;
   for(int i = 0; i < matrix.size(); i++){
-    string a = nodes1[res[i][0]], b = nodes2[res[i][1]];
-    for(auto it = matches.begin(); it != matches.end(); it++){
-      if(it->get_n1() == a && it->get_n2() == b){
-        ans.push_back(*it);
-        break;
+    if(res[i][0] < nodes1.size() && res[i][1] < nodes2.size()){
+      string a = nodes1[res[i][0]], b = nodes2[res[i][1]];
+      for(auto it = matches.begin(); it != matches.end(); it++){
+        if(it->get_n1() == a && it->get_n2() == b){
+          ans.push_back(*it);
+          break;
+        }
       }
     }
     delete[] res[i];
@@ -136,7 +138,7 @@ void extendAlignment(D_alpha seed, Graph& g1, Graph& g2, bmap *alignment, vector
 
   while(!maxP.empty()){
     D_alpha best = maxP.front();
-    cout << "Extending from seed [" << best.get_n1() << ", " << best.get_n2() << "]\n";
+    //cout << "Extending from seed [" << best.get_n1() << ", " << best.get_n2() << "]\n";
     //cout << "Queue contains " << maxP.size() << " matches\n";
     pop_heap(maxP.begin(), maxP.end(), CompareD_alphaL());
     maxP.pop_back();
@@ -152,13 +154,13 @@ void extendAlignment(D_alpha seed, Graph& g1, Graph& g2, bmap *alignment, vector
     matches = performMatching(matches);
     //Filter out matches that are already aligned or have D_seq>beta
     remove_if(matches.begin(), matches.end(), checkBeta(beta));
-    cout << "aligned " << matches.size() << " nodes\n";
+    //cout << "aligned " << matches.size() << " nodes\n";
 
     for(auto it = matches.begin(); it != matches.end(); ++it){
       alignment->insert(bmap::value_type(it->get_n1(), it->get_n2()));
       maxP.push_back(*it);
       push_heap(maxP.begin(), maxP.end(), CompareD_alphaL());
     }
-    cout << "alignment now contains " << alignment->size() << " matches\n\n";
+    //cout << "alignment now contains " << alignment->size() << " matches\n\n";
   }
 }

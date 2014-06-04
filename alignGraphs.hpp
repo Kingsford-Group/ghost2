@@ -75,6 +75,7 @@ void printMap(bmap f)
 
 void alignGraphs(Graph& G, Graph& H, vector<D_alpha>& distances, double beta, int k)
 {
+  cout << "aligning graphs...\n";
   vector<D_alpha> minP;  // empty vector is a heap
   for(auto it = distances.begin(); it != distances.end(); it++)
   {
@@ -83,6 +84,39 @@ void alignGraphs(Graph& G, Graph& H, vector<D_alpha>& distances, double beta, in
   }
 
   ptime t = bclock::local_time();
-  printMap(seedAndExtend(G, H, minP, beta, k));
+  bmap result = seedAndExtend(G, H, minP, beta, k);
   cout << "aligned graphs in " << (bclock::local_time()-t).total_milliseconds() << " milliseconds\n";
+  printMap(result);
+
+  int matchingEdges = 0;
+  int edgesH = 0;
+  for(auto it = result.left.begin(); it != result.left.end(); it++)
+  {
+    auto adj1 = G.neighbors(it->first);
+    auto adj2 = H.neighbors(it->second);
+    for(auto it2 = adj1.begin(); it2 != adj1.end(); it2++){
+      auto f_a = result.left.find(*it2);
+      if(f_a != result.left.end() && adj2.find(f_a->second) != adj2.end()){
+        matchingEdges++;
+        if(*it2 == it->first) matchingEdges++; //Double count self loops
+      }
+    }
+    for(auto it2 = adj2.begin(); it2 != adj2.end(); it2++) 
+      if(result.right.find(*it2) != result.right.end()){
+        edgesH++;
+        if(*it2 == it->second) edgesH++; //Double count self loops
+      }
+  }
+  vector<string> nodesG = G.nodes();
+  int edgesG = 0;
+  for(auto it = nodesG.begin(); it != nodesG.end(); it++){
+    auto n = G.neighbors(*it);
+    edgesG += n.size();
+    if(n.find(*it) != n.end()) edgesG++; //Double count self loops
+  }
+
+  double ec = ((double)matchingEdges / edgesG) * 100.0;
+  double ics = ((double)matchingEdges / edgesH) * 100.0;
+  cout << "Edge correctness " << matchingEdges/2 << " / " << edgesG/2 << " = " << ec << "\%\n";
+  cout << "ICS = " << ics << "\%\n";
 }

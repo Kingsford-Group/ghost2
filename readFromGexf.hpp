@@ -108,7 +108,7 @@ void getEdges(ifstream *fin, Graph *target, idtoval *itv)
     if(cur == "**EOF**") {cout << "read edges error"; break;}
     string id1 = extract(cur, "source");
     string id2 = extract(cur, "target");
-    if(id1 != "**EOS**" && id2 != "**EOS**" && id1 != id2)
+    if(id1 != "**EOS**" && id2 != "**EOS**")
       (*target).addEdge((*itv)[id1], (*itv)[id2]);
   }
 }

@@ -3,5 +3,7 @@
 *.stackdump
 *.gz
 *.gexf
-threadpool.hpp
-threadpool/
+*.swp
+*.swo
+*.dist
+*.af
