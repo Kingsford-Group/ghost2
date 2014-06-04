@@ -60,7 +60,7 @@ void ConfigData::configure(string filename)
     exit(0);
   }
   // check for [main]
-  char *next;
+  char next[200];
   fscanf(fin,"%[^\n]\n",next);
   if(string(next) != "[main]")
   {

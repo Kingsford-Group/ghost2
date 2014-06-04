@@ -4,7 +4,7 @@
 #include <boost/unordered_map.hpp>
 #include "Eigen/Dense"
 #include "Eigen/Eigenvalues"
-#include "graph.h"
+#include "graph.hpp"
 
 using std::vector;
 using namespace Eigen;

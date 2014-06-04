@@ -31,7 +31,7 @@ void computeSpectralSignatures(Graph *input, int numHops, int numP)
   w.writeInt(numNodes);
   w.writeInt(numHops);
   
-  umap levelmap;
+  levelMap levelmap;
   vector< vector<LevelData> > data;
   data.resize(numNodes);
   for(int i=0;i<numNodes;i++)

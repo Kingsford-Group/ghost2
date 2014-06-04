@@ -4,6 +4,7 @@
 #include <vector>
 #include <utility>
 #include <tgmath.h>
+#include "swapEndian.hpp"
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/device/file_descriptor.hpp>
@@ -30,13 +31,6 @@ struct LevelInfo{
 typedef boost::unordered_map<string, vector<LevelInfo> > spectramap;
 
 //Helpers for Reading the GZip
-template <typename T>
-void swap_endian(T& pX)
-{
-  char& raw = reinterpret_cast<char&>(pX);
-  std::reverse(&raw, &raw + sizeof(T));
-}
-
 int readInt(istream& in)
 {
   int num = sizeof(int32_t)/sizeof(char);

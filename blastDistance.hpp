@@ -8,12 +8,13 @@ using std::string;
 using std::pair;
 using std::ifstream;
 
-typedef boost::unordered_map<pair<string,string>, double> umap;
+typedef boost::unordered_map<pair<string,string>, double> blastMap;
 
-int getBlastMap(string filename)
+blastMap getBlastMap(string filename)
 {
-  umap bevals;
+  blastMap bevals;
   ifstream fin (filename);
+  std::cout << filename << " is the filename\n";
   while(1)
   {
     string n1,n2;
@@ -23,13 +24,5 @@ int getBlastMap(string filename)
     bevals[make_pair(n1,n2)] = d;
   }
   fin.close();
-  umap::iterator iter = bevals.begin(),
-  iend = bevals.end();
   return bevals;
-//  for(; iter != iend; ++iter)
-//  {
-//    std::cout << (iter->first).first << "\t"
-//              << (iter->first).second << "\t"
-//              << iter->second << "\n";
-//  }
 }

@@ -4,9 +4,10 @@
 #include "config.hpp"
 #include "graph.hpp"
 #include "readFromGexf.hpp"
-//#include "computeSpectralSignatures.h"
+#include "computeSpectralSignatures.hpp"
+#include "blastDistance.hpp"
 #include "spectralToDistance.hpp"
-#include "alignGraphs.hpp"
+//#include "alignGraphs.hpp"
 
 using std::string;
 using std::cout;
@@ -14,23 +15,36 @@ using std::cout;
 void computeAlignment(ConfigData c)
 {
   Graph G = readFromGexf(c.Ggexf);
+  cout << "done reading in G\n";
   Graph H = readFromGexf(c.Hgexf);
-  G.print();
-  H.print();
-//  computeSpectralSignatures(&G, c.hops, c.numProcessors);
-//  computeSpectralSignatures(&H, c.hops, c.numProcessors);
-//  spectralToDistance(G,H); // done by david
+  cout << "done reading in H\n";
+  if(c.Gsigs == "")
+  {
+    computeSpectralSignatures(&G, c.hops, c.numProcessors);
+    c.Gsigs = (G.getName() + ".sig.gz");
+  }
+  cout << "done writing sigs for G\n";
+  if(c.Hsigs == "")
+  {
+    computeSpectralSignatures(&H, c.hops, c.numProcessors);
+    c.Hsigs = (H.getName() + ".sig.gz");
+  }
+  cout << "done writing sigs for H\n";
+  blastMap *evals = new blastMap;
+  if(c.SeqScores == "")
+    evals = NULL;
+  else
+    *evals = getBlastMap(c.SeqScores);
+  getDistances(c.Gsigs, c.Hsigs, (G.getName()+"_vs_"+H.getName()+".sdf"), 
+               c.alpha, NULL);
+  delete evals;
+  cout << "done getting distances\n";
 //  alignGraphs(G,H); // done by david
 }
 
 int main(int argc, char** argv)
 {
-  Graph G = readFromGexf("scerehc.gexf");
-  Graph H = readFromGexf("scere05.gexf");
-  auto dists = getDistances("scerehc.sig.gz","scere05.sig.gz", "scerehc_vs_scere05.dist", 1, NULL);
-  alignGraphs(G,H, dists, 100, 3000);
-
-  /*ConfigData c;
+  ConfigData c;
   for(int i=1; i<argc; i++)
   {
     if(string(argv[i]) == "-c") 
@@ -45,7 +59,7 @@ int main(int argc, char** argv)
     cout << "gexf files not provided\n";
     return 0;
   }
-  computeAlignment(c);*/
+  computeAlignment(c);
   return 0;
 }
 
