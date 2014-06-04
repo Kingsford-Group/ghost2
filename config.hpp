@@ -10,11 +10,11 @@ struct ConfigData
          Gsigs="", Hsigs="",
          SeqScores="";
   int numProcessors=20,
-      hops=3,
+      hops=4,
       nneighbors=-1, // dummy for all
       searchiter = 10; // not sure
   double alpha=-1.0,
-         beta=1.0,
+         beta=100,
          ratio=8.0; // not sure
   bool dumpDistances=false;
   void use(string s);
@@ -38,7 +38,8 @@ void ConfigData::use(string s)
         case 2: Gsigs = s; break;
         case 3: Hsigs = s; break;
         case 4: SeqScores = s; break;
-        case 5: nneighbors = atoi(s.c_str()); break;
+        case 5: if(s=="all") nneighbors = -1;
+                else nneighbors = atoi(s.c_str()); break;
         case 6: searchiter = atoi(s.c_str()); break;
         case 7: hops = atoi(s.c_str()); break;
         case 8: numProcessors = atoi(s.c_str()); break;

@@ -7,7 +7,7 @@
 #include "computeSpectralSignatures.hpp"
 #include "blastDistance.hpp"
 #include "spectralToDistance.hpp"
-//#include "alignGraphs.hpp"
+#include "alignGraphs.hpp"
 
 using std::string;
 using std::cout;
@@ -35,11 +35,13 @@ void computeAlignment(ConfigData c)
     evals = NULL;
   else
     *evals = getBlastMap(c.SeqScores);
-  getDistances(c.Gsigs, c.Hsigs, (G.getName()+"_vs_"+H.getName()+".sdf"), 
-               c.alpha, NULL);
+  vector<D_alpha> dist = 
+    getDistances(c.Gsigs, c.Hsigs, (G.getName()+"_vs_"+H.getName()+".sdf"), 
+                 c.alpha, evals);
   delete evals;
-  cout << "done getting distances\n";
-//  alignGraphs(G,H); // done by david
+  cout << "done writing distances\n";
+  alignGraphs(G, H, dist, c.beta, c.nneighbors);
+  cout << "DONE\n";
 }
 
 int main(int argc, char** argv)
