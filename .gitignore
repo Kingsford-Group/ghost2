@@ -7,3 +7,6 @@
 *.swo
 *.dist
 *.af
+*.sdf
+Configs/
+Data/
