@@ -95,6 +95,7 @@ void applyAlpha(double a, vector<D_alpha>& scores, blastmap* blastscores)
 
     maxheap.clear();
     for(auto it = scores.begin(); it != scores.end(); it++){
+      if(blastscores->find(make_pair(it->get_n1(), it->get_n2())) == blastscores->end()) continue;
       double score = blastscores->at(make_pair(it->get_n1(), it->get_n2()));
       if(score != 0) maxheap.push_back(score);
       push_heap(maxheap.begin(), maxheap.end());
@@ -103,13 +104,19 @@ void applyAlpha(double a, vector<D_alpha>& scores, blastmap* blastscores)
         maxheap.pop_back();
       }
     }
-    double seqval = maxheap.front();
-    a = seqval/structval;
+    if(maxheap.size() == 0) a = 1;
+    else {
+      double seqval = maxheap.front();
+      a = seqval/structval;
+    }
   }
 
   for(auto it = scores.begin(); it != scores.end(); it++){
     double topo = it->get_da();
-    double seq = blastscores==NULL?0:blastscores->at(make_pair(it->get_n1(), it->get_n2()));
+    double seq;
+    if(blastscores==NULL) seq = 0;
+    else if(blastscores->find(make_pair(it->get_n1(), it->get_n2())) == blastscores->end()) seq = topo;
+    else seq = blastscores->at(make_pair(it->get_n1(), it->get_n2()));
     it->update_da(a*topo + (1.0-a)*seq, seq);
   }
 }
