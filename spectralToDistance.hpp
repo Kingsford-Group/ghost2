@@ -11,8 +11,8 @@
 #include "threadpool.hpp"
 #include "fastonebigheader.h"
 
-#include "gzreader.h"
-#include "dalpha.h"
+#include "gzReader.hpp"
+#include "dalpha.hpp"
 
 using std::vector;
 using std::string;

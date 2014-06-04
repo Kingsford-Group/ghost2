@@ -1,7 +1,8 @@
 #include <string>
 #include <algorithm>
 #include <iostream>
-#include "graph.h"
+#include "swapEndian.hpp"
+#include "graph.hpp"
 
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
@@ -22,14 +23,7 @@ struct LevelData
     vnames(v), spectrum(s), density(d){};
 };
 
-typedef boost::unordered_map<string, vector<LevelData> > umap;
-
-template <typename T>
-void swap_endian(T& pX)
-{
-  char& raw = reinterpret_cast<char&>(pX);
-  std::reverse(&raw, &raw + sizeof(T));
-}
+typedef boost::unordered_map<string, vector<LevelData> > levelMap;
 
 class GzWriter
 {
@@ -42,7 +36,7 @@ class GzWriter
     void writeDouble(double d)
     {swap_endian(d); out.write(reinterpret_cast<const char*>(&d),sizeof(d));};
     void writeString(string s);
-    void writeData(umap levelmap);
+    void writeData(levelMap levelmap);
 };
 
 void GzWriter::writeString(string s)
@@ -53,9 +47,9 @@ void GzWriter::writeString(string s)
   out.write(reinterpret_cast<const char*>(&s[0]),s.size());
 }
 
-void GzWriter::writeData(umap levelmap)
+void GzWriter::writeData(levelMap levelmap)
 {
-  umap::iterator iter = levelmap.begin(),
+  levelMap::iterator iter = levelmap.begin(),
   iend = levelmap.end();
   for(; iter != iend; iter++)
   {
