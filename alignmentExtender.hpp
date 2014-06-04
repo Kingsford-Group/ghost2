@@ -47,7 +47,7 @@ vector<D_alpha> computePairwiseScores(boost::unordered_set<string>& n1, boost::u
 
       D_alpha d = dalphas.at(make_pair(*it1,*it2));
       //If we don't have k yet, add it
-      if(maxheap.size() < k){
+      if(maxheap.size() < k || k==-1){
         maxheap.push_back(d);
         push_heap(maxheap.begin(), maxheap.end(), CompareD_alphaL());
       //Otherwise add and trim back down to k

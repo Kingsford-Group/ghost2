@@ -135,6 +135,7 @@ Graph readFromGexf(string fileName)
     cout << "gexf does not have attribute gname\n";
     exit(0);
   }
+  fin.close();
   return result;
 }
 

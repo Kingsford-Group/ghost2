@@ -59,10 +59,6 @@ void GzWriter::writeData(levelMap levelmap)
       writeInt(i);
       int sz = (iter->second)[i-1].vnames.size();
       writeInt(sz);
-//      vlist::iterator vit = (iter->second)[i-1].vnames.begin(),
-//      vend = (iter->second)[i-1].vnames.end();
-//      for(; vit != vend; vit++)
-//        writeString(*vit);
       for(int j=0;j<sz;j++)
         writeString((iter->second)[i-1].vnames[j]);
       sz = (iter->second)[i-1].spectrum.size();
