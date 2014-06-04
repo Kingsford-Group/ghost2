@@ -10,11 +10,10 @@ using std::ifstream;
 
 typedef boost::unordered_map<pair<string,string>, double> umap;
 
-int main()
+int getBlastMap(string filename)
 {
   umap bevals;
-  ifstream fin ("AThaliana_vs_DMel.evalues");
-//  ifstream fin ("test.evalues");
+  ifstream fin (filename);
   while(1)
   {
     string n1,n2;
@@ -26,12 +25,11 @@ int main()
   fin.close();
   umap::iterator iter = bevals.begin(),
   iend = bevals.end();
-  for(; iter != iend; ++iter)
-  {
-//    std::cout << iter->first << "\t" << iter->second << "\n";
-    std::cout << (iter->first).first << "\t"
-              << (iter->first).second << "\t"
-              << iter->second << "\n";
-  }
-  return 0;
+  return bevals;
+//  for(; iter != iend; ++iter)
+//  {
+//    std::cout << (iter->first).first << "\t"
+//              << (iter->first).second << "\t"
+//              << iter->second << "\n";
+//  }
 }

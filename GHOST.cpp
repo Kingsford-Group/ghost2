@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include <stdlib.h>
-#include "config.h"
+#include "config.hpp"
 #include "graph.hpp"
 #include "readFromGexf.hpp"
 //#include "computeSpectralSignatures.h"
