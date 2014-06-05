@@ -93,7 +93,8 @@ struct distanceWorker {
       if(n!=100) cout << ">";
       for(int j=n*.65+1; j<65; j++) cout << " ";
       auto elapsed = (bclock::local_time() - time).total_seconds();
-      cout << "] ETA " << (elapsed>0?(int)(elapsed * (100.0/n) - elapsed):0) <<"s  \r";
+      int eta = elapsed>0?(int)(elapsed * (100.0/n) - elapsed):0; 
+      cout << "] ETA " << eta << (eta<10?"s  \r":eta<100?"s \r":"s\r");
       cout.flush();
       mut->unlock();
     }
