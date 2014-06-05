@@ -61,9 +61,9 @@ bmap seedAndExtend(Graph& G, Graph& H, vector<D_alpha>& minP, double beta, int k
 }
 
 /* prints all key-value pairs in f */
-void printMap(bmap f)
+void printMap(bmap f, string gname, string hname)
 {
-  ofstream fout ("test.af");
+  ofstream fout (gname+"_vs_"+hname+".af");
   bmap::left_const_iterator iter = f.left.begin(),
   iend = f.left.end();
   for(; iter != iend; ++iter)
@@ -86,7 +86,7 @@ void alignGraphs(Graph& G, Graph& H, vector<D_alpha>& distances, double beta, in
   ptime t = bclock::local_time();
   bmap result = seedAndExtend(G, H, minP, beta, k);
   cout << "aligned graphs in " << (bclock::local_time()-t).total_milliseconds() << " milliseconds\n";
-  printMap(result);
+  printMap(result, G.getName(), H.getName());
 
   int matchingEdges = 0;
   int edgesH = 0;
