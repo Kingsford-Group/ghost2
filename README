@@ -1,0 +1,51 @@
+Introduction
+============
+
+GHOST is a program that aligns two networks using an algorithm detailed in "Global Network Alignment Using Multiscale Spectral Signatures" by Rob Patro and Carl Kingsford. This version of the code is written in C++ and is faster than the previous version (see https://github.com/rob-p/GHOST). Currently, it is only supported on Windows (using Cygwin) and Unix machines.
+
+Building
+========
+
+To use this code, click on the "Download ZIP" button on the right side of the git repository (https://github.com/davidlindenbaum/GHOST-CPP) and unzip it. You will need to download and install the C++ Boost library if you do not currently have it installed from (www.boost.org/users/download). In addition, make sure that your g++ is recent enough that is supports c++11. You can check by running g++ -dumpversion in a terminal and googling.
+
+Now, using a terminal navigate to the directory that you unzipped from and execute the following commands:
+
+  $ cd GHOST-CPP
+  $ make BOOSTDIR=<PATH_TO_BOOST>
+
+where <PATH_TO_BOOST> is the absolute path to the lib folder containing the boost libaries (ex. libboost_thread.a). You should see a file named GHOST in the directory now.
+
+File Formats
+============
+
+Configuration Format
+--------------------
+
+Graph File Format
+-----------------
+
+GHOST uses the GEXF format which can be found at (http://gexf.net/format). The graph should have the attribute title="gname" and the ids and values of each node should be unique.
+
+Alignment File Format
+---------------------
+
+Spectral Distance Format
+------------------------
+
+Signature Format
+----------------
+
+Usage
+=====
+
+First, make a config file in the folder (see file formats).
+
+GHOST has the following options:
+
+  -c    This option accepts the path to the configuration file as an argument. It should almost always be present when you run the program.
+  -p    This option accepts the number of processors it should use as an argument. It is recommended that this is not set because the program automatically generates what should be the optimal number of processors.
+  -k    This option accepts the radius from the each node the spectral signature should be computed. The default value is 4.
+
+A example of an ordinary run is:
+
+  $ ./GHOST -c cjejuni_vs_ecoli.cfg

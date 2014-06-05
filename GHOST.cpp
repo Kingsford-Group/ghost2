@@ -14,53 +14,63 @@ using std::cout;
 
 void computeAlignment(ConfigData c)
 {
+  // read in graph
   Graph G = readFromGexf(c.Ggexf);
-  cout << "done reading in G\n";
   Graph H = readFromGexf(c.Hgexf);
-  cout << "done reading in H\n";
+
+  // compute spectral signatures
   if(c.Gsigs == "")
   {
     computeSpectralSignatures(&G, c.hops, c.numProcessors);
     c.Gsigs = (G.getName() + ".sig.gz");
   }
-  cout << "done writing sigs for G\n";
   if(c.Hsigs == "")
   {
     computeSpectralSignatures(&H, c.hops, c.numProcessors);
     c.Hsigs = (H.getName() + ".sig.gz");
   }
-  cout << "done writing sigs for H\n";
+  if(c.dumpSignatures) return; // if user only wanted sigs
+
+  // get evalues if given
   blastMap *evals = new blastMap;
   if(c.SeqScores == "")
     evals = NULL;
   else
     *evals = getBlastMap(c.SeqScores);
+
+  // compute distances
   vector<D_alpha> dist = 
     getDistances(c.Gsigs, c.Hsigs, (G.getName()+"_vs_"+H.getName()+".sdf"), 
-                 c.alpha, evals);
+                 c.alpha, evals /*, c.numProcessors*/);
+  if(c.dumpDistances) return; // if user wanted just the distances...
   delete evals;
-  cout << "done writing distances\n";
+
+  // align graphs
   alignGraphs(G, H, dist, c.beta, c.nneighbors);
-  cout << "DONE\n";
 }
 
 int main(int argc, char** argv)
 {
   ConfigData c;
+
+  // read in options
   for(int i=1; i<argc; i++)
   {
     if(string(argv[i]) == "-c") 
-    { 
       if((i+1)<argc) 
-        c.configure(string(argv[i+1])); 
-    }
+        c.configure(string(argv[i+1]));
+    if(string(argv[i]) == "-k")
+      if((i+1)<argc)
+        c.hops = atoi(argv[i+1]);
+    if(string(argv[i]) == "-p")
+      if((i+1)<argc)
+        c.numProcessors = atoi(argv[i+1]);
   }
 
-  if(c.Ggexf == "" || c.Hgexf == "")
-  {
-    cout << "gexf files not provided\n";
-    return 0;
-  }
+  if(c.Ggexf == "" || c.Hgexf == "") // required input
+    { cout << "gexf files not provided\n"; return 0; }
+
+  // and here we go!
   computeAlignment(c);
   return 0;
 }
