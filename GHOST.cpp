@@ -41,8 +41,8 @@ void computeAlignment(ConfigData c)
   // compute distances
   vector<D_alpha> dist = 
     getDistances(c.Gsigs, c.Hsigs, (G.getName()+"_vs_"+H.getName()+".sdf"), 
-                 c.alpha, evals);
-  if(c.dumpDistances) return; // if user wanted the distances...
+                 c.alpha, evals /*, c.numProcessors*/);
+  if(c.dumpDistances) return; // if user wanted just the distances...
   delete evals;
 
   // align graphs
