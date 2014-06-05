@@ -18,6 +18,17 @@ using std::istream;
 using std::ofstream;
 using std::ostringstream;
 
+//Fancy fast pow2 function from fastonebigheader.h
+static inline float fastpow2 (float p)
+{
+  float offset = (p < 0) ? 1.0f : 0.0f;
+  float clipp = (p < -126) ? -126.0f : p;
+  int w = clipp;
+  float z = clipp - w + offset;
+  union { uint32_t i; float f; } v = { static_cast<uint32_t> ( (1 << 23) * (clipp + 121.2740575f + 27.7280233f / (4.84252568f - z) - 1.49012907f * z) ) };
+  return v.f;
+}
+
 struct LevelInfo{
   vector<string> vnames;
   vector<double> spectrum;
@@ -74,7 +85,7 @@ double gaussianDensity(double* spec, int s, double omega, double sigsq, double n
 {
   double d = 1e-30;
   for(int i=0; i<s; i++) 
-    d += norm * fastexp(-((omega - spec[i]) * (omega - spec[i])) / sigsq);
+    d += norm * fastpow2(1.442695040f * -((omega - spec[i]) * (omega - spec[i])) / sigsq);
   return d;
 }
 
