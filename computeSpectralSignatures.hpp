@@ -2,14 +2,17 @@
 #include <string>
 #include <vector>
 #include <boost/unordered_map.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include "graph.hpp"
 #include "laplacian.hpp"
 #include "gzWriter.hpp"
 
-#include <boost/thread/thread.hpp>
+#include <boost/thread.hpp>
 #include "threadpool.hpp"
 
 using boost::threadpool::pool;
+typedef boost::posix_time::microsec_clock bclock;
+typedef boost::posix_time::ptime ptime;
 
 void spectrum(Graph *input, int numHops, string source, 
               vector<LevelData> *output)
@@ -24,6 +27,9 @@ void spectrum(Graph *input, int numHops, string source,
 
 void computeSpectralSignatures(Graph *input, int numHops, int numP)
 {
+  ptime t = bclock::local_time();
+  if(numP < 1) numP = boost::thread::hardware_concurrency();
+  if(numP < 1) numP = 2;
   pool tpool(numP);
   vector<string> nodes = (*input).nodes();
   int numNodes = nodes.size();
@@ -43,5 +49,7 @@ void computeSpectralSignatures(Graph *input, int numHops, int numP)
   for(int i=0;i<numNodes;i++)
     levelmap[nodes[i]] = data[i];
   w.writeData(levelmap);
+  cout << "created: " << (*input).getName() << ".sig.gz in " <<
+    (bclock::local_time() - t).total_milliseconds() << " milliseconds\n";
 }
 

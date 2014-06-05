@@ -1,7 +1,9 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <time.h>
 #include <boost/unordered_map.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include "graph.hpp"
 
 using std::string;
@@ -10,6 +12,8 @@ using std::cout;
 using boost::unordered_map;
 
 typedef unordered_map<string,string> idtoval;
+typedef boost::posix_time::microsec_clock bclock;
+typedef boost::posix_time::ptime ptime;
 
 /* returns string with next tag */
 string nextTag(ifstream *fin)
@@ -116,6 +120,7 @@ void getEdges(ifstream *fin, Graph *target, idtoval *itv)
 /* returns the adjacency list stored in fileName */
 Graph readFromGexf(string fileName)
 {
+  ptime t = bclock::local_time();
   Graph result;
   idtoval itv;
   ifstream fin(fileName);
@@ -136,6 +141,8 @@ Graph readFromGexf(string fileName)
     exit(0);
   }
   fin.close();
+  cout << "extracted: " << result.getName() << ".gexf in " <<
+    (bclock::local_time() - t).total_milliseconds() << " milliseconds\n";
   return result;
 }
 

@@ -14,7 +14,6 @@ blastMap getBlastMap(string filename)
 {
   blastMap bevals;
   ifstream fin (filename);
-  std::cout << filename << " is the filename\n";
   while(1)
   {
     string n1,n2;

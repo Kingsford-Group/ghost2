@@ -9,14 +9,15 @@ struct ConfigData
   string Ggexf="", Hgexf="",
          Gsigs="", Hsigs="",
          SeqScores="";
-  int numProcessors=20,
+  int numProcessors=-1,
       hops=4,
       nneighbors=-1, // dummy for all
       searchiter = 10; // not sure
   double alpha=-1.0,
          beta=100,
          ratio=8.0; // not sure
-  bool dumpDistances=false;
+  bool dumpSignatures=false,
+       dumpDistances=false;
   void use(string s);
   void configure(string filename);
   void print();
@@ -26,7 +27,8 @@ void ConfigData::use(string s)
 {
   string pos[] = {"network1: ", "network2: ", "sigs1: ", "sigs2: ",
                   "sequencescores: ", "nneighbors: ", "searchiter: ",
-                  "hops: ", "alpha: ", "beta: ", "ratio: "};
+                  "hops: ", "alpha: ", "beta: ", "ratio: ", 
+                  "dumpSignatures: ", "dumpDistances: "};
   for(int i=0;i<9;i++)
     if(s.size() > pos[i].size() && s.substr(0,pos[i].size()) == pos[i])
     {
@@ -46,6 +48,8 @@ void ConfigData::use(string s)
         case 9: alpha = atof(s.c_str()); break;
         case 10: beta = atof(s.c_str()); break;
         case 11: ratio = atof(s.c_str()); break;
+        case 12: if(s=="true") dumpSignatures=true;
+        case 13: if(s=="true") dumpDistances=true;
         default: printf("\"%s\" may be incorrect",s.c_str()); break;
       }
     }
