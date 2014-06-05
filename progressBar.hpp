@@ -1,14 +1,19 @@
 #include <boost/thread.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <iostream>
+
+typedef boost::posix_time::microsec_clock bclock;
+typedef boost::posix_time::ptime ptime;
 
 class ProgressBar
 {
   int prev=0, count=0, max;
   double progress=0;
-  int barWidth=50;
+  int barWidth=64;
+  ptime time;
   boost::mutex mutex;
   public:
-    ProgressBar(int i) {max=i;};
+    ProgressBar(int i, ptime awastin) {max=i; time = awastin;};
     void update();
 };
 
@@ -20,7 +25,8 @@ void ProgressBar::update()
     if(mutex.try_lock())
     {
       prev++;
-      std::cout << "[";
+      int n = (int)(progress*100.0);
+      std::cout << n << "%" << (n<10?"  [":n<100?" [":"[");
       int pos = barWidth * progress;
       for(int i=0;i<barWidth;i++)
       {
@@ -28,7 +34,10 @@ void ProgressBar::update()
         else if(i==pos) std::cout << ">";
         else std::cout << " ";
       }
-      std::cout << "]" << int(progress*100.0) << "%\r";
+      auto elapsed = (bclock::local_time() - time).total_seconds();
+      int eta = elapsed>0?(int)(elapsed / progress - elapsed):0;
+      std::cout << "] ETA " << eta << 
+        (eta<10?"s   \r":eta<100?"s  \r":eta<1000?"s \r":"s\r");
       std::cout.flush();
       mutex.unlock();
     }

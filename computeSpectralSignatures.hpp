@@ -36,7 +36,7 @@ void computeSpectralSignatures(Graph *input, int numHops, int numP)
   vector<string> nodes = (*input).nodes();
   int numNodes = nodes.size();
   GzWriter w((*input).getName()+".sig.gz");
-  ProgressBar p(numNodes);
+  ProgressBar p(numNodes, t);
   cout << "creating: " << (*input).getName() << ".sig.gz\n";
   w.writeInt(numNodes);
   w.writeInt(numHops);
