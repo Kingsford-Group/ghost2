@@ -43,12 +43,24 @@ The configuration file must have [main] as its first line and must include value
   sigs1 - The .sig.gz file containing the precomputed signatures for network1.
   sigs2 - The .sig.gz file containing the precomputed signatures for network2.
   sequencescores - The .evalues file containing the precomputed BLAST evalues.
-  processors - The positive integer value for the number of processors to use. If this is not set, GHOST will automatically generate what should be the optimal value.
-  hops - The positive integer value for the radius of the subgraphs. The default value is 4.
-  alpha - The positive decimal value for the weight of the BLAST evalues in the distance function. The value should be between 0 and 1 and be written in decimal format (ex. 0.5). If no user-suggested alpha is provided, GHOST will generate one as defined in the paper.
-  beta - The positive decimal value for the hard constraint on sequence similarity of aligned pairs. The default value is 100.
-  dumpSignatures - The boolean value (true or false) for whether you want the computation to stop after computing the signatures. Note that the boolean values are lower case. The default value is false.
-  dumpDistances - The boolean value (true or false) for whether you want the computation to stop after computing the distances. Note that the boolean values are lower case. The default value is false.
+  processors - The positive integer value for the number of processors to use. 
+               If this is not set, GHOST will automatically generate what 
+               should be the optimal value.
+  hops - The positive integer value for the radius of the subgraphs. The 
+         default value is 4.
+  alpha - The positive decimal value for the weight of the BLAST evalues in 
+          the distance function. The value should be between 0 and 1 and be 
+          written in decimal format (ex. 0.5). If no user-suggested alpha is 
+          provided, GHOST will generate one as defined in the paper.
+  beta - The positive decimal value for the hard constraint on sequence 
+         similarity of aligned pairs. The default value is 100.
+  dumpSignatures - The boolean value (true or false) for whether you want the 
+                   computation to stop after computing the signatures. Note 
+                   that the boolean values are lower case. The default value 
+                   is false.
+  dumpDistances - The boolean value (true or false) for whether you want the 
+                  computation to stop after computing the distances. Note that 
+                  the boolean values are lower case. The default value is false.
 
 Graph File Format
 -----------------
