@@ -11,15 +11,44 @@ To use this code, click on the "Download ZIP" button on the right side of the gi
 Now, using a terminal navigate to the directory that you unzipped from and execute the following commands:
 
   $ cd GHOST-CPP
-  $ make BOOSTDIR=<PATH_TO_BOOST>
+  $ export BOOSTLIB=<PATH_TO_BOOSTLIB>
+  $ export BOOSTDIR=<PATH_TO_BOOSTDIR>
+  $ make
 
-where <PATH_TO_BOOST> is the absolute path to the lib folder containing the boost libaries (ex. libboost_thread.a). You should see a file named GHOST in the directory now.
+where <PATH_TO_BOOSTLIB> and <PATH_TO_BOOSTDIR> are the absolute paths to the lib folder containing the boost libaries (ex. libboost_thread.a) and the include folder containing the boost folder with all of the .hpp files. If it errors, it is possible that your ld library path is not set to the right place. Trying something like:
+
+  $ LD_LIBRARY_PATH=/opt/local/lib:$LD_LIBRARY_PATH
+
+may help. If all has went well, you should see an executable file named GHOST in the directory now.
 
 File Formats
 ============
 
 Configuration Format
 --------------------
+
+The configuration file tells the program what you want it to do. It will look something like:
+
+  [main]
+  network1: Data/CJejuni/cjejuni.gexf
+  network2: Data/EColi/ecoli.gexf
+  sequencescores: Data/CJejuni_vs_EColi.evalues
+  hops: 5
+
+The configuration file must have [main] as its first line and must include values for network1 and network2. In addition, there should be no spaces preceding or following the text in each line. You can set each option by putting that option on a line followed by a ':' character, a space, and the appropriate value. The options that can be set are as follows:
+
+  NAME - DESCRIPTION
+  network1 - The .gexf file describing the first network that is to be aligned.
+  network2 - The .gexf file describing the second network that is to be aligned.
+  sigs1 - The .sig.gz file containing the precomputed signatures for network1.
+  sigs2 - The .sig.gz file containing the precomputed signatures for network2.
+  sequencescores - The .evalues file containing the precomputed BLAST evalues.
+  processors - The positive integer value for the number of processors to use. If this is not set, GHOST will automatically generate what should be the optimal value.
+  hops - The positive integer value for the radius of the subgraphs. The default value is 4.
+  alpha - The positive decimal value for the weight of the BLAST evalues in the distance function. The value should be between 0 and 1 and be written in decimal format (ex. 0.5). If no user-suggested alpha is provided, GHOST will generate one as defined in the paper.
+  beta - The positive decimal value for the hard constraint on sequence similarity of aligned pairs. The default value is 100.
+  dumpSignatures - The boolean value (true or false) for whether you want the computation to stop after computing the signatures. Note that the boolean values are lower case. The default value is false.
+  dumpDistances - The boolean value (true or false) for whether you want the computation to stop after computing the distances. Note that the boolean values are lower case. The default value is false.
 
 Graph File Format
 -----------------
@@ -49,3 +78,15 @@ GHOST has the following options:
 A example of an ordinary run is:
 
   $ ./GHOST -c cjejuni_vs_ecoli.cfg
+
+Libraries Used
+==============
+
+The GHOST program uses the following free-to-use libraries and files:
+
+  1. Boost (www.boost.org)
+  2. Eigen (eigen.tuxfamily.org)
+  3. threadpool (threadpool.sourceforge.net)
+  4. fastapprox (https://code.google.com/p/fastapprox)
+
+

@@ -1,10 +1,12 @@
-CC = g++
-CFLAGS = -O3 -std=c++11
-BOOSTDIR ?= /usr/local/lib
-LFLAGS = -lboost_iostreams -lboost_system -lboost_thread
+CXX = g++
+CXXFLAGS = -O3 -std=c++11
+HEADERS = alignGraphs.hpp alignmentExtender.hpp blastDistance.hpp computeSpectralSignatures.hpp config.hpp dalpha.hpp graph.hpp gzReader.hpp gzWriter.hpp hungarian.hpp laplacian.hpp progressBar.hpp readFromGexf.hpp spectralToDistance.hpp swapEndian.hpp
+BOOSTDIR ?= /usr/local/include
+BOOSTLIB ?= /usr/local/lib
+LFLAGS = -lboost_iostreams -lboost_system -lboost_thread -lpthread
 
-GHOST: GHOST.cpp
-	$(CC) GHOST.cpp $(CFLAGS) -L $(BOOSTDIR) $(LFLAGS) -o GHOST
+GHOST: GHOST.cpp $(HEADERS)
+	$(CXX) GHOST.cpp $(CXXFLAGS) -I $(BOOSTDIR) -L $(BOOSTLIB) $(LFLAGS) -o GHOST
 
 clean:
 	\rm *.sig.gz *.sdf *.af

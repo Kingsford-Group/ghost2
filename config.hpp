@@ -27,7 +27,7 @@ void ConfigData::use(string s)
 {
   string pos[] = {"network1: ", "network2: ", "sigs1: ", "sigs2: ",
                   "sequencescores: ", "nneighbors: ", "searchiter: ",
-                  "hops: ", "alpha: ", "beta: ", "ratio: ", 
+                  "hops: ", "processors: ", "alpha: ", "beta: ", "ratio: ", 
                   "dumpSignatures: ", "dumpDistances: "};
   for(int i=0;i<9;i++)
     if(s.size() > pos[i].size() && s.substr(0,pos[i].size()) == pos[i])
@@ -66,7 +66,11 @@ void ConfigData::configure(string filename)
   }
   // check for [main]
   char next[200];
-  fscanf(fin,"%[^\n]\n",next);
+  if(fscanf(fin,"%[^\n]\n",next) == 0)
+  {
+    printf("config file appears empty\n");
+    exit(0);
+  }
   if(string(next) != "[main]")
   {
     printf("no [main] in config file\n"); 
