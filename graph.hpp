@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdlib.h>
 #include <string>
 #include <vector>
 #include <boost/unordered_set.hpp>
@@ -22,7 +23,10 @@ class Graph
     void addVertex(string v) {vlist e; m[v]=e;};
     void addEdge(string v1, string v2) {m[v1].insert(v2); m[v2].insert(v1);};
     vector<string> nodes();
-    vlist neighbors(string v) {return m[v];};
+    vlist neighbors(string v) 
+      {if(m.find(v)==m.end()) {std::cout<<"error: .sig.gz may be incorrect\n";
+                               exit(0);}
+       else return m[v];};
     void print();
 };
 

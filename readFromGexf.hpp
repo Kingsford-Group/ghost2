@@ -25,7 +25,7 @@ string nextTag(ifstream *fin)
     if((*fin).good())
       c=(*fin).get();
     else
-      return "**EOF**";
+      return "<EOF>"; // otherwise impossible return value
   }
   while(c!='>')
   {
@@ -39,16 +39,21 @@ string nextTag(ifstream *fin)
 /* extracts attribute from string */
 string extract(string s, string attribute)
 {
-  attribute = " "+attribute+"=";
-  std::size_t loc = s.find(attribute);
+  std::size_t loc = s.find(" "+attribute+"=");
   if(loc != std::string::npos)
   {
+    string prev=s.substr(0,loc);
+    int count=0; // make sure this isn't in quotes
+    for(size_t nxt=prev.find("\"");nxt!=std::string::npos;
+        nxt=prev.find("\"",nxt+1)) ++count;
     s = s.substr(loc);
+    if(count%2==1) 
+      return extract(s.substr(s.find("\"")+1),attribute);
     s = s.substr(s.find("\"")+1);
     s = s.substr(0,s.find("\""));
     return s;
   }
-  return "**EOS**";
+  return "<EOS>"; // otherwise impossible return value
 }
 
 /* extracts the title of the gexf */
@@ -58,14 +63,14 @@ string getAttribute(ifstream *fin)
   while(cur.substr(0,10) != "attributes")
   {
     cur = nextTag(fin);
-    if(cur == "**EOF**") {cout << "read attribute error"; break;}
+    if(cur == "<EOF>") {cout << "read attribute error"; break;}
   }
   while(cur != "/attributes")
   {
     cur = nextTag(fin);
-    if(cur == "**EOF**") {cout << "read attribute error"; break;}
+    if(cur == "<EOF>") {cout << "read attribute error"; break;}
     string title = extract(cur,"title");
-    if(title != "**EOS**")
+    if(title != "<EOS>")
       return title;
   }
   return "";
@@ -78,18 +83,18 @@ void getNodes(ifstream *fin, Graph *target, idtoval *itv)
   while(cur.substr(0,5) != "nodes")
   {
     cur = nextTag(fin);
-    if(cur == "**EOF**") {cout << "read nodes error"; break;}
+    if(cur == "<EOF>") {cout << "read nodes error"; break;}
   }
   string curid;
   while(cur != "/nodes")
   {
     cur = nextTag(fin);
-    if(cur == "**EOF**") {cout << "read nodes error"; break;}
+    if(cur == "<EOF>") {cout << "read nodes error"; break;}
     string id = extract(cur,"id");
-    if(id != "**EOS**")
+    if(id != "<EOS>")
       curid = id;
     string value = extract(cur,"value");
-    if(value != "**EOS**")
+    if(value != "<EOS>")
     {
       (*target).addVertex(value);
       (*itv)[curid] = value;
@@ -104,15 +109,15 @@ void getEdges(ifstream *fin, Graph *target, idtoval *itv)
   while(cur.substr(0,5) != "edges")
   {
     cur = nextTag(fin);
-    if(cur == "**EOF**") {cout << "read edges error"; break;}
+    if(cur == "<EOF>") {cout << "read edges error"; break;}
   }
   while(cur != "/edges")
   {
     cur = nextTag(fin);
-    if(cur == "**EOF**") {cout << "read edges error"; break;}
+    if(cur == "<EOF>") {cout << "read edges error"; break;}
     string id1 = extract(cur, "source");
     string id2 = extract(cur, "target");
-    if(id1 != "**EOS**" && id2 != "**EOS**")
+    if(id1 != "<EOS>" && id2 != "<EOS>")
       (*target).addEdge((*itv)[id1], (*itv)[id2]);
   }
 }

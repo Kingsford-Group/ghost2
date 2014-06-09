@@ -50,7 +50,8 @@ void ConfigData::use(string s)
         case 11: ratio = atof(s.c_str()); break;
         case 12: if(s=="true") dumpSignatures=true;
         case 13: if(s=="true") dumpDistances=true;
-        default: printf("\"%s\" may be incorrect",s.c_str()); break;
+        default: printf("the configuration option \"%s\" may be incorrect",
+                        s.c_str()); break;
       }
     }
 }
