@@ -1,7 +1,6 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include <time.h>
 #include <boost/unordered_map.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include "graph.hpp"
@@ -63,12 +62,12 @@ string getAttribute(ifstream *fin)
   while(cur.substr(0,10) != "attributes")
   {
     cur = nextTag(fin);
-    if(cur == "<EOF>") {cout << "read attribute error"; break;}
+    if(cur == "<EOF>") {cout << "read attribute error\n"; break;}
   }
   while(cur != "/attributes")
   {
     cur = nextTag(fin);
-    if(cur == "<EOF>") {cout << "read attribute error"; break;}
+    if(cur == "<EOF>") {cout << "read attribute error\n"; break;}
     string title = extract(cur,"title");
     if(title != "<EOS>")
       return title;
@@ -83,13 +82,13 @@ void getNodes(ifstream *fin, Graph *target, idtoval *itv)
   while(cur.substr(0,5) != "nodes")
   {
     cur = nextTag(fin);
-    if(cur == "<EOF>") {cout << "read nodes error"; break;}
+    if(cur == "<EOF>") {cout << "read nodes error\n"; break;}
   }
   string curid;
   while(cur != "/nodes")
   {
     cur = nextTag(fin);
-    if(cur == "<EOF>") {cout << "read nodes error"; break;}
+    if(cur == "<EOF>") {cout << "read nodes error\n"; break;}
     string id = extract(cur,"id");
     if(id != "<EOS>")
       curid = id;
@@ -109,12 +108,12 @@ void getEdges(ifstream *fin, Graph *target, idtoval *itv)
   while(cur.substr(0,5) != "edges")
   {
     cur = nextTag(fin);
-    if(cur == "<EOF>") {cout << "read edges error"; break;}
+    if(cur == "<EOF>") {cout << "read edges error\n"; break;}
   }
   while(cur != "/edges")
   {
     cur = nextTag(fin);
-    if(cur == "<EOF>") {cout << "read edges error"; break;}
+    if(cur == "<EOF>") {cout << "read edges error\n"; break;}
     string id1 = extract(cur, "source");
     string id2 = extract(cur, "target");
     if(id1 != "<EOS>" && id2 != "<EOS>")
@@ -129,6 +128,7 @@ Graph readFromGexf(string fileName)
   Graph result;
   idtoval itv;
   ifstream fin(fileName);
+  if(!fin.good()) {cout << "error loading file: " << fileName << "\n"; exit(0);}
   unsigned start = fileName.find_last_of("/");
   unsigned end = fileName.find(".gexf");
   if(start == string::npos) start = -1;
@@ -140,11 +140,7 @@ Graph readFromGexf(string fileName)
     getNodes(&fin, &result, &itv);
     getEdges(&fin, &result, &itv);
   }
-  else
-  {
-    cout << "gexf does not have attribute gname\n";
-    exit(0);
-  }
+  else {cout << "ERROR: gexf does not have attribute gname\n"; exit(0);}
   fin.close();
   cout << "extracted: " << result.getName() << ".gexf in " <<
     (bclock::local_time() - t).total_milliseconds() << " milliseconds\n";

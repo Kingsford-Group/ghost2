@@ -8,8 +8,11 @@ LFLAGS = -lboost_iostreams -lboost_system -lboost_thread -lpthread
 GHOST: GHOST.cpp $(HEADERS)
 	$(CXX) GHOST.cpp $(CXXFLAGS) -I $(BOOSTDIR) -L $(BOOSTLIB) $(LFLAGS) -o GHOST
 
+likenew:
+	\rm -f *.sig.gz *.sdf *.af GHOST
+
 clean:
-	\rm *.sig.gz *.sdf *.af
+	\rm -f GHOST
 
 tar:
 	tar cfv *.sig.gz *.sdf *.af

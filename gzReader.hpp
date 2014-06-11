@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <stdlib.h>
 #include <tgmath.h>
 #include "swapEndian.hpp"
 #include <boost/iostreams/filtering_stream.hpp>
@@ -109,6 +110,9 @@ vector<double> ipsenMikhailovVector(double* spectrum, int s, double gamma)
 //Read the signatures from the GZip file, and calculate the spectral signatures
 spectramap loadSigs(string file)
 {
+
+  if(FILE *check = fopen(file.c_str(),"r")) {fclose(check);}
+  else {std::cout << "file: " << file << " not found\n"; exit(0);}
 
   io::filtering_istream in;
   in.push(io::gzip_decompressor());

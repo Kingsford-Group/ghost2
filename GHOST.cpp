@@ -4,6 +4,7 @@
 #include "config.hpp"
 #include "graph.hpp"
 #include "readFromGexf.hpp"
+#include "readFromNet.hpp"
 #include "computeSpectralSignatures.hpp"
 #include "blastDistance.hpp"
 #include "spectralToDistance.hpp"
@@ -15,8 +16,18 @@ using std::cout;
 void computeAlignment(ConfigData c)
 {
   // read in graph
-  Graph G = readFromGexf(c.Ggexf);
-  Graph H = readFromGexf(c.Hgexf);
+  Graph G,H;
+  if(c.Ggraph.substr(c.Ggraph.size()-5) == ".gexf")
+    G = readFromGexf(c.Ggraph);
+  else if(c.Ggraph.substr(c.Ggraph.size()-4) == ".net")
+    G = readFromNet(c.Ggraph);
+  else {cout << "bad extension: " << c.Ggraph << "\n"; exit(0);}
+
+  if(c.Hgraph.substr(c.Hgraph.size()-5) == ".gexf")
+    H = readFromGexf(c.Hgraph);
+  else if(c.Hgraph.substr(c.Hgraph.size()-4) == ".net")
+    H = readFromNet(c.Hgraph);
+  else {cout << "bad extension: " << c.Hgraph << "\n"; exit(0);}
 
   // compute spectral signatures
   if(c.Gsigs == "")
@@ -67,7 +78,7 @@ int main(int argc, char** argv)
         c.numProcessors = atoi(argv[i+1]);
   }
 
-  if(c.Ggexf == "" || c.Hgexf == "") // required input
+  if(c.Ggraph == "" || c.Hgraph == "") // required input
     { cout << "gexf files not provided\n"; return 0; }
 
   // and here we go!

@@ -6,7 +6,7 @@ using std::string;
 
 struct ConfigData
 {
-  string Ggexf="", Hgexf="",
+  string Ggraph="", Hgraph="",
          Gsigs="", Hsigs="",
          SeqScores="";
   int numProcessors=-1,
@@ -29,14 +29,16 @@ void ConfigData::use(string s)
                   "sequencescores: ", "nneighbors: ", "searchiter: ",
                   "hops: ", "processors: ", "alpha: ", "beta: ", "ratio: ", 
                   "dumpSignatures: ", "dumpDistances: "};
-  for(int i=0;i<9;i++)
+  bool used=false;
+  for(int i=0;i<13;i++)
     if(s.size() > pos[i].size() && s.substr(0,pos[i].size()) == pos[i])
     {
       s = s.substr(pos[i].size());
+      used=true;
       switch (i)
       {
-        case 0: Ggexf = s; break;
-        case 1: Hgexf = s; break;
+        case 0: Ggraph = s; break;
+        case 1: Hgraph = s; break;
         case 2: Gsigs = s; break;
         case 3: Hsigs = s; break;
         case 4: SeqScores = s; break;
@@ -50,10 +52,12 @@ void ConfigData::use(string s)
         case 11: ratio = atof(s.c_str()); break;
         case 12: if(s=="true") dumpSignatures=true;
         case 13: if(s=="true") dumpDistances=true;
-        default: printf("the configuration option \"%s\" may be incorrect",
-                        s.c_str()); break;
+        default: break;
       }
     }
+  if(!used)
+    printf("WARNING: the configuration option \"%s\" may be incorrect\n\n", 
+           s.c_str());
 }
 
 void ConfigData::configure(string filename)
@@ -85,10 +89,10 @@ void ConfigData::configure(string filename)
 
 void ConfigData::print()
 {
-  printf("Ggexf: %s\nHgexf: %s\nGsigs: %s\nHsigs: %s\nSeqScores: %s\n"
+  printf("Ggraph: %s\nHgraph: %s\nGsigs: %s\nHsigs: %s\nSeqScores: %s\n"
           "nneighbors: %d\nsearchiter: %d\nbeta: %lf\nratio: %lf\n", 
-          Ggexf.c_str(), 
-          Hgexf.c_str(), 
+          Ggraph.c_str(), 
+          Hgraph.c_str(), 
           Gsigs.c_str(), 
           Hsigs.c_str(), 
           SeqScores.c_str(), 
