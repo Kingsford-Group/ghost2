@@ -1,15 +1,15 @@
 CXX = g++
 CXXFLAGS = -O3 -std=c++11
-HEADERS = alignGraphs.hpp alignmentExtender.hpp blastDistance.hpp computeSpectralSignatures.hpp config.hpp dalpha.hpp graph.hpp gzReader.hpp gzWriter.hpp hungarian.hpp laplacian.hpp progressBar.hpp readFromGexf.hpp spectralToDistance.hpp swapEndian.hpp
+
+HEADERS = $(wildcard src/*.hpp)
+
 BOOSTDIR ?= /usr/local/include
 BOOSTLIB ?= /usr/local/lib
 LFLAGS = -lboost_iostreams -lboost_system -lboost_thread -lpthread
+INCLUDES = -I include -I $(BOOSTDIR) -L $(BOOSTLIB) $(LFLAGS)
 
-GHOST: GHOST.cpp $(HEADERS)
-	$(CXX) GHOST.cpp $(CXXFLAGS) -I $(BOOSTDIR) -L $(BOOSTLIB) $(LFLAGS) -o GHOST
-
-likenew:
-	\rm -f *.sig.gz *.sdf *.af GHOST
+GHOST: src/GHOST.cpp $(HEADERS)
+	$(CXX) src/GHOST.cpp $(CXXFLAGS) $(INCLUDES) -o $@
 
 clean:
 	\rm -f GHOST
