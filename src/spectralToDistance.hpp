@@ -71,38 +71,23 @@ double DTopo(LevelInfo *v1, LevelInfo *v2, int s)
 }*/
 
 //Calculates the D_alphas from node n to all nodes in m2
-struct distanceWorker {
-  distanceWorker(spectramap::value_type n, spectramap* m2, D_alpha** r, string* o, mutex *m, int *c, int t, ptime time):
-    it(m2->begin()), end(m2->end()), result(r), name(n.first), info(n.second), out(o), mut(m), count(c), total(t), time(time){}
-  void operator()()
-  {
-    ostringstream res;
-    int i=0;
-    for(; it != end; ++it){
-      double topo = DTopo(&info[0], &(it->second)[0], info.size());
-      res << name << "\t" << it->first << "\t" << topo << "\n";
-      D_alpha* d = new D_alpha(name, it->first, topo);
-      result[i++] = d;
-    }
-    *count += i;
-    if(mut->try_lock()){
-      int n = (*count * 100) / total;
-      cout << n << "%" << (n<10?"  ":n<100?" ":"");
-      cout << "[";
-      for(int j=0; j<(int)(n*.65); j++) cout << "=";
-      if(n!=100) cout << ">";
-      for(int j=n*.65+1; j<65; j++) cout << " ";
-      auto elapsed = (bclock::local_time() - time).total_seconds();
-      int eta = elapsed>0?(int)(elapsed * (100.0/n) - elapsed):0; 
-      cout << "] ETA " << eta << (eta<10?"s  \r":eta<100?"s \r":"s\r");
-      cout.flush();
-      mut->unlock();
-    }
-    *out = res.str();
+void distanceWorker(spectramap::value_type n, spectramap* m2, 
+    D_alpha** result, string* out, ProgressBar *pbar)
+{
+  auto end = m2->end();
+  string name = n.first;
+  vector<LevelInfo> info = n.second;
+  ostringstream res;
+  int i=0;
+  for(auto it = m2->begin(); it != end; ++it){
+    double topo = DTopo(&info[0], &(it->second)[0], info.size());
+    res << name << "\t" << it->first << "\t" << topo << "\n";
+    D_alpha* d = new D_alpha(name, it->first, topo);
+    result[i++] = d;
   }
-  private:
-  string name; vector<LevelInfo> info; spectramap::iterator it, end; D_alpha** result; string* out; mutex *mut; int *count; int total; ptime time;
-};
+  pbar->update();
+  *out = res.str();
+}
 
 void applyAlpha(double a, vector<D_alpha>& scores, blastmap* blastscores)
 {
@@ -175,14 +160,14 @@ vector<D_alpha> getDistances(string file1, string file2, string outputname, doub
   cout << "\ncalculating D_alphas on " << numthreads << " threads\n";
   boost::threadpool::pool threads(numthreads);
 
+  ProgressBar pbar(m1.size(), t);
   mutex *mut = new mutex;
   int *count = new int(0);
   for(spectramap::iterator it1 = m1.begin(); it1 != m1.end(); ++it1){
-    //results.push_back((D_alpha**)calloc(m2.size(), sizeof(D_alpha*)));
     results.push_back(new D_alpha*[m2.size()]);
     outputs.push_back(new string);
-    distanceWorker worker(*it1, &m2, results.back(), outputs.back(), mut, count, (m1.size()*m2.size()), t);
-    threads.schedule(worker);
+    threads.schedule(boost::bind(&distanceWorker, *it1, &m2, results.back(), 
+        outputs.back(), &pbar));
   }
 
   threads.wait();
@@ -210,11 +195,4 @@ vector<D_alpha> getDistances(string file1, string file2, string outputname, doub
   out.close();
   return allDistances;
 }
-
-/*int main()
-{
-  getDistances("Data/AThal/athal.sig.gz", "Data/AThal/athal.sig.gz", "distances.txt", .1, NULL, -1);
-  return 0;
-}*/
-
 

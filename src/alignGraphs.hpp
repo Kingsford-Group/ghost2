@@ -73,6 +73,43 @@ void printMap(bmap f, string gname, string hname)
   fout.close();
 }
 
+void toDotFile(Graph& G, Graph& H, bmap f)
+{
+  boost::unordered_set<string> verts;
+  vector<pair<string,string>> edges1;
+  vector<pair<string,string>> edges2;
+  vector<pair<string,string>> edges3;
+  for(auto it = f.left.begin(); it != f.left.end(); it++){
+    auto adj1 = G.neighbors(it->first);
+    auto adj2 = H.neighbors(it->second);
+    for(auto it2 = adj1.begin(); it2 != adj1.end(); it2++){
+      auto f_a = f.left.find(*it2);
+      if(f_a != f.left.end()){
+        if(adj2.find(f_a->second) != adj2.end()){
+          if(find(edges1.begin(), edges1.end(), make_pair(f_a->first, it->first)) == edges1.end()){
+            edges1.push_back(make_pair(it->first, f_a->first));
+            verts.insert(it->first);
+            verts.insert(f_a->first);
+          }
+        }else{
+          if(find(edges2.begin(), edges2.end(), make_pair(f_a->first, it->first)) == edges2.end()){
+            //edges2.push_back(make_pair(it->first, f_a->first));
+            //verts.insert(it->first);
+            //verts.insert(f_a->first);
+          }
+        }
+      }
+    }
+  }
+  ofstream fout ("test.dot");
+  fout << "graph G {\n";
+  for(auto it = verts.begin(); it != verts.end(); it++) fout << *it << "[label = \"" << *it << "\\n" << f.left.at(*it) << "\"]\n";
+  for(auto it = edges1.begin(); it != edges1.end(); it++) fout << it->first << " -- " << it->second << "\n";
+  for(auto it = edges2.begin(); it != edges2.end(); it++) fout << it->first << " -- " << it->second << " [color = \"red\"];\n";
+  fout << "}";
+  fout.close();
+}
+
 void alignGraphs(Graph& G, Graph& H, vector<D_alpha>& distances, double beta, int k)
 {
   cout << "aligning graphs...\n";
@@ -119,4 +156,5 @@ void alignGraphs(Graph& G, Graph& H, vector<D_alpha>& distances, double beta, in
   double ics = ((double)matchingEdges / edgesH) * 100.0;
   cout << "Edge correctness " << matchingEdges/2 << " / " << edgesG/2 << " = " << ec << "\%\n";
   cout << "ICS = " << ics << "\%\n";
+  //toDotFile(G, H, result);
 }
