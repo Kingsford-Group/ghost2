@@ -14,7 +14,7 @@ typedef boost::posix_time::ptime ptime;
 
 Graph readFromNet(string fileName)
 { 
-//  ptime t = bclock::local_time();
+  ptime t = bclock::local_time();
   Graph result;
   ifstream fin(fileName);
   if(!fin.good()) 
@@ -41,8 +41,8 @@ Graph readFromNet(string fileName)
     result.addEdge(n1,n2);
   }
   fin.close();
-//  cout << "extracted: " << result.getName() << ".net in " <<
-//    (bclock::local_time() - t).total_milliseconds() << " milliseconds\n";
+  cout << "extracted: " << result.getName() << ".net in " <<
+    (bclock::local_time() - t).total_milliseconds() << " milliseconds\n";
   return result;
 }
 

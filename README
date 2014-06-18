@@ -17,7 +17,7 @@ Now, using a terminal navigate to the directory that you unzipped from and execu
 
 where <PATH_TO_BOOSTLIB> and <PATH_TO_BOOSTDIR> are the absolute paths to the lib folder containing the boost libaries (ex. libboost_thread.a) and the include folder containing the boost folder with all of the .hpp files. If it errors, it is possible that your ld library path is not set to the right place. Trying something like:
 
-  $ LD_LIBRARY_PATH=/opt/local/lib:$LD_LIBRARY_PATH
+  $ export LD_LIBRARY_PATH=/opt/local/lib:$LD_LIBRARY_PATH
 
 may help. If all has went well, you should see an executable file named GHOST in the directory now.
 
@@ -55,8 +55,10 @@ The configuration file tells the program what you want it to do. It will look so
 The configuration file must have [main] as its first line and must include values for network1 and network2. In addition, there should be no spaces preceding or following the text in each line. You can set each option by putting that option on a line followed by a ':' character, a space, and the appropriate value. The options that can be set are as follows:
 
   NAME - DESCRIPTION
-  network1 - The .gexf file describing the first network that is to be aligned.
-  network2 - The .gexf file describing the second network that is to be aligned.
+  network1 - The .gexf or .net file describing the first network that is to 
+             be aligned.
+  network2 - The .gexf or .net file describing the second network that is to 
+             be aligned.
   sigs1 - The .sig.gz file containing the precomputed signatures for network1.
   sigs2 - The .sig.gz file containing the precomputed signatures for network2.
   sequencescores - The .evalues file containing the precomputed BLAST evalues.
@@ -81,10 +83,19 @@ The configuration file must have [main] as its first line and must include value
 
 The extension associated with this format is ".cfg".
 
-Graph File Format
------------------
+Graph File Format (gexf)
+------------------------
 
-GHOST uses the GEXF format which can be found at (http://gexf.net/format). The graph should have the attribute title="gname" and the ids and values of each node should be unique. The extension associated with this format is ".gexf".
+GHOST can use the GEXF format which can be found at (http://gexf.net/format). The graph should have the attribute title="gname" and the ids and values of each node should be unique. The extension associated with this format is ".gexf".
+
+Graph File Format (net)
+-----------------------
+
+GHOST can also use the .net format which is composed of |E| lines of the form:
+
+  v1 v2
+
+where v1 and v2 are verticies in the graph. The extension associated with this format is ".net".
 
 Alignment File Format
 ---------------------
