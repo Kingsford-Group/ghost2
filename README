@@ -1,12 +1,12 @@
 Introduction
 ============
 
-GHOST is a program that aligns two networks using an algorithm detailed in "Global Network Alignment Using Multiscale Spectral Signatures" by Rob Patro and Carl Kingsford. The paper can be found at (http://bioinformatics.oxfordjournals.org/content/early/2012/10/08/bioinformatics.bts592.full.pdf+html). This version of the code is written in C++ and is faster than the previous version (see https://github.com/rob-p/GHOST). Currently, it is only supported on Windows (using Cygwin) and Unix machines.
+GHOST is a program that aligns two networks using an algorithm detailed in "Global Network Alignment Using Multiscale Spectral Signatures" by Rob Patro and Carl Kingsford. The paper can be found at (http://bioinformatics.oxfordjournals.org/content/early/2012/10/08/bioinformatics.bts592.full.pdf+html). This version of the code is written in C++ and is faster than the previous version (see https://github.com/rob-p/GHOST). Currently, it has only been built on Windows (using Cygwin) and Unix machines.
 
 Building
 ========
 
-To use this code, click on the "Download ZIP" button on the right side of the git repository (https://github.com/davidlindenbaum/GHOST-CPP) and unzip it. You will need to download and install the C++ Boost library if you do not currently have it installed from (www.boost.org/users/download). If Boost is not installed, please read the Installing Boost section before proceeding. In addition, make sure that your g++ is recent enough that is supports c++11. The version GHOST was built with was 4.8.2, but you can check by running g++ -dumpversion in a terminal and googling.
+To use this code, first download it from the git repository (https://github.com/davidlindenbaum/GHOST-CPP). You will need to download and install the C++ Boost library if you do not currently have it installed from (www.boost.org/users/download). If Boost is not installed, please read the Installing Boost section before proceeding. In addition, make sure that your g++ is recent enough that is supports c++11. The version GHOST was built with was 4.8.2, but you can check by running g++ -dumpversion in a terminal and googling.
 
 Now, using a terminal navigate to the directory that you unzipped from and execute the following commands:
 
@@ -36,7 +36,7 @@ First download Boost from (www.boost.org/user/download) and zlib from (www.zlib.
   $ ./boostrap.sh
   $ sudo ./b2 install
 
-If all went well, Boost will be installed. It is likely that you will be able run make without changing their default values now.
+If all went well, Boost will be installed. It is likely that you will be able run make now.
 
 File Formats
 ============
