@@ -9,6 +9,7 @@
 #include "blastDistance.hpp"
 #include "spectralToDistance.hpp"
 #include "alignGraphs.hpp"
+#include "localImprove.hpp"
 
 using std::string;
 using std::cout;
@@ -53,11 +54,14 @@ void computeAlignment(ConfigData c)
   vector<D_alpha> dist = 
     getDistances(c.Gsigs, c.Hsigs, (G.getName()+"_vs_"+H.getName()+".sdf"), 
                  c.alpha, evals , c.numProcessors);
-  if(c.dumpDistances) return; // if user wanted just the distances...
-  delete evals;
+  if(c.dumpDistances) { delete evals; return; }// if user wanted just the distances...
 
   // align graphs
-  alignGraphs(G, H, dist, c.beta, c.nneighbors);
+  bmap f = alignGraphs(G, H, dist, c.beta, c.nneighbors);
+  localImprove(G, H, evals, &f, c.searchiter, c.ratio);
+  printICS(G, H, f);
+  delete evals;
+  printMap(f, G.getName(), H.getName());
 }
 
 int main(int argc, char** argv)

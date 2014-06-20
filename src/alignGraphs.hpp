@@ -110,21 +110,8 @@ void toDotFile(Graph& G, Graph& H, bmap f)
   fout.close();
 }
 
-void alignGraphs(Graph& G, Graph& H, vector<D_alpha>& distances, double beta, int k)
+void printICS(Graph& G, Graph& H, bmap& result)
 {
-  cout << "aligning graphs...\n";
-  vector<D_alpha> minP;  // empty vector is a heap
-  for(auto it = distances.begin(); it != distances.end(); it++)
-  {
-    minP.push_back(*it);
-    push_heap(minP.begin(),minP.end(),CompareD_alphaG());
-  }
-
-  ptime t = bclock::local_time();
-  bmap result = seedAndExtend(G, H, minP, beta, k);
-  cout << "aligned graphs in " << (bclock::local_time()-t).total_milliseconds() << " milliseconds\n";
-  printMap(result, G.getName(), H.getName());
-
   int matchingEdges = 0;
   int edgesH = 0;
   for(auto it = result.left.begin(); it != result.left.end(); it++)
@@ -156,5 +143,23 @@ void alignGraphs(Graph& G, Graph& H, vector<D_alpha>& distances, double beta, in
   double ics = ((double)matchingEdges / edgesH) * 100.0;
   cout << "Edge correctness " << matchingEdges/2 << " / " << edgesG/2 << " = " << ec << "\%\n";
   cout << "ICS = " << ics << "\%\n";
+}
+
+bmap alignGraphs(Graph& G, Graph& H, vector<D_alpha>& distances, double beta, int k)
+{
+  cout << "aligning graphs...\n";
+  vector<D_alpha> minP;  // empty vector is a heap
+  for(auto it = distances.begin(); it != distances.end(); it++)
+  {
+    minP.push_back(*it);
+    push_heap(minP.begin(),minP.end(),CompareD_alphaG());
+  }
+
+  ptime t = bclock::local_time();
+  bmap result = seedAndExtend(G, H, minP, beta, k);
+  cout << "aligned graphs in " << (bclock::local_time()-t).total_milliseconds() << " milliseconds\n";
+
+  printICS(G, H, result);
+  return result;
   //toDotFile(G, H, result);
 }
