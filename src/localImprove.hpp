@@ -73,7 +73,10 @@ int searchIter(Graph& G, Graph& H, blastmap *dists, bmap *f, double ratio)
 {
   int totalDelt = 0;
   vector<string> hverts = H.nodes();
-  for(auto it = f->left.begin(); it != f->left.end(); it++){
+  vector<pair<string,string>> pairs;
+  for(auto it = f->left.begin(); it != f->left.end(); it++) 
+    pairs.push_back(make_pair(it->first, it->second));
+  for(auto it = pairs.begin(); it != pairs.end(); it++){
     string u = it->first;
     string w = it->second;
     
