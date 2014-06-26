@@ -30,7 +30,7 @@ void ConfigData::use(string s)
                   "hops: ", "processors: ", "alpha: ", "beta: ", "ratio: ", 
                   "dumpSignatures: ", "dumpDistances: "};
   bool used=false;
-  for(int i=0;i<13;i++)
+  for(int i=0;i<14;i++)
     if(s.size() > pos[i].size() && s.substr(0,pos[i].size()) == pos[i])
     {
       s = s.substr(pos[i].size());
