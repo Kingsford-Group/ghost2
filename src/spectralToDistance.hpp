@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 #include <tgmath.h>
-#include <mutex>
 
 #include <boost/unordered_map.hpp>
 #include <boost/thread.hpp>
@@ -20,7 +19,6 @@ using std::vector;
 using std::string;
 using std::cout;
 using std::pair;
-using std::mutex;
 
 typedef boost::posix_time::microsec_clock bclock;
 typedef boost::posix_time::ptime ptime;
@@ -37,6 +35,7 @@ static inline float fastlog2 (float x)
            - 1.498030302f * mx.f 
            - 1.72587999f / (0.3520887068f + mx.f);
 }
+int min(int a, int b){return a<b?a:b;}
 
 //Helpers for D_alpha calculation
 double klDiv(double *p1, double *p2, int count)
@@ -60,7 +59,8 @@ double DTopo(LevelInfo *v1, LevelInfo *v2, int s)
 {
   double dist = 0;
   for(int i = 0; i < s; i++)
-    dist += jsDist(&(v1[i].signature)[0], &(v2[i].signature)[0], v1[i].signature.size());
+    dist += jsDist(&(v1[i].signature)[0], &(v2[i].signature)[0], 
+        min(v1[i].signature.size(), v2[i].signature.size()));
   return dist/s;
 }
 
@@ -82,7 +82,7 @@ void distanceWorker(spectramap::value_type n, spectramap* m2,
   ostringstream res;
   int i=0;
   for(auto it = m2->begin(); it != end; ++it){
-    double topo = DTopo(&info[0], &(it->second)[0], info.size());
+    double topo = DTopo(&info[0], &(it->second)[0], min(info.size(), it->second.size()));
     res << name << "\t" << it->first << "\t" << topo << "\n";
     D_alpha* d = new D_alpha(name, it->first, topo);
     result[i++] = d;
@@ -163,8 +163,6 @@ vector<D_alpha> getDistances(string file1, string file2, string outputname, doub
   boost::threadpool::pool threads(numthreads);
 
   ProgressBar pbar(m1.size(), t);
-  mutex *mut = new mutex;
-  int *count = new int(0);
   for(spectramap::iterator it1 = m1.begin(); it1 != m1.end(); ++it1){
     results.push_back(new D_alpha*[m2.size()]);
     outputs.push_back(new string);
@@ -175,8 +173,6 @@ vector<D_alpha> getDistances(string file1, string file2, string outputname, doub
   threads.wait();
   cout << "\nfinished calculating " << (m1.size()*m2.size()) << " distances in " << 
     (bclock::local_time()-t).total_seconds() << "s\n";
-  delete count;
-  delete mut;
 
   vector<D_alpha> allDistances;
   for(int i=0; i<results.size(); i++){

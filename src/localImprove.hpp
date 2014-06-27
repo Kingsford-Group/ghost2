@@ -15,15 +15,14 @@ typedef boost::unordered_map<pair<string,string>, D_alpha> distmap;
 struct move{
   string u, w, v, up;
   double s0, s1, s2;
-  move(string u, string w, string up, string v) : u(u),w(w),up(up),v(v){} 
+  move(string u, string w, string v) : u(u),w(w),v(v){s0 = s1 = s2 = 0;} 
   void apply(bmap *f)
   {
     f->left.erase(u);
     if(up != "") f->left.erase(up);
-    f->right.erase(w);
-    f->right.erase(v);
     f->insert(bmap::value_type(u, v));
     if(up != "") f->insert(bmap::value_type(up, w));
+    up = u;
   }
   void calcScores(Graph& G, Graph& H, blastmap *dists, bmap *f)
   {
@@ -73,21 +72,22 @@ int searchIter(Graph& G, Graph& H, blastmap *dists, bmap *f, double ratio)
 {
   int totalDelt = 0;
   vector<string> hverts = H.nodes();
-  vector<pair<string,string>> pairs;
+  vector<string> lefts;
   for(auto it = f->left.begin(); it != f->left.end(); it++) 
-    pairs.push_back(make_pair(it->first, it->second));
-  for(auto it = pairs.begin(); it != pairs.end(); it++){
-    string u = it->first;
-    string w = it->second;
+    lefts.push_back(it->first);
+
+  for(auto it = lefts.begin(); it != lefts.end(); it++){
+    string u = *it;
+    string w = f->left.at(u);
     
     move *bestMove = NULL;
     bool constrained = rand() > (ratio*RAND_MAX);
+
     for(auto it2 = hverts.begin(); it2 != hverts.end(); it2++){
-      string v = *it2;
-      string up = "";
-      auto upt = f->right.find(v);
-      if(upt != f->right.end()) up = upt->second;
-      move m(u, w, up, v);
+      move m(u, w, *it2);
+      m.up = "";
+      auto upt = f->right.find(*it2);
+      if(upt != f->right.end()) m.up = upt->second;
       m.calcScores(G, H, dists, f);
       //Check if move is acceptible
       if(m.s0 > 0 && m.s1 >= 0 && (!constrained || m.s2 >= 0)){
@@ -109,8 +109,9 @@ int searchIter(Graph& G, Graph& H, blastmap *dists, bmap *f, double ratio)
 
 int localImprove(Graph& G, Graph& H, blastmap *dists, bmap *f, int iters, double ratio)
 {
+  if(iters <= 0) return 0;
   vector<double> ratios;
-  double sum;
+  double sum = 0;
   for(int i=0; i < iters; i++){
     double d = exp(-i);
     sum += d;
@@ -120,9 +121,11 @@ int localImprove(Graph& G, Graph& H, blastmap *dists, bmap *f, int iters, double
   int totalDelt = 0;
   for(int i=0; i < iters; i++){
     ptime t = bclock::local_time();
-    cout << "running PISWAP iteration, " << (ratios[i] * sum * 100) << "\% unconstrained\n";
-    int d = searchIter(G, H, dists, f, ratios[i] * sum);
-    cout << "added " << d << " edges in " << (bclock::local_time() - t).total_milliseconds() << "ms\n";
+    double unconstrained = ratios[i] * sum;
+    if(unconstrained > 1) unconstrained = 1;
+    cout << "running PISWAP iteration, " << (unconstrained * 100) << "\% unconstrained\n";
+    int d = searchIter(G, H, dists, f, unconstrained);
+    cout << "added " << d << " edges in " << (bclock::local_time() - t).total_seconds() << "s\n";
     totalDelt += d;
     if(d == 0) break;
   }
