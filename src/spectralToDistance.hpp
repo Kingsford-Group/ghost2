@@ -91,11 +91,11 @@ void distanceWorker(spectramap::value_type n, spectramap* m2,
   *out = res.str();
 }
 
-void applyAlpha(double a, vector<D_alpha>& scores, blastmap* blastscores)
+void applyAlpha(double a, double b, vector<D_alpha>& scores, blastmap* blastscores)
 {
-  if(blastscores==NULL) a=1;
+  if(!blastscores) return;
 
-  if(a==-1){
+  if(a == -1){
     vector<double> maxheap;
     for(auto it = scores.begin(); it != scores.end(); it++){
       if(it->get_da() != 0) maxheap.push_back(it->get_da());
@@ -109,8 +109,9 @@ void applyAlpha(double a, vector<D_alpha>& scores, blastmap* blastscores)
 
     maxheap.clear();
     for(auto it = scores.begin(); it != scores.end(); it++){
-      if(blastscores->find(make_pair(it->get_n1(), it->get_n2())) == blastscores->end()) continue;
-      double score = blastscores->at(make_pair(it->get_n1(), it->get_n2()));
+      auto sc = blastscores->find(make_pair(it->get_n1(), it->get_n2()));
+      if(sc == blastscores->end()) continue;
+      double score = sc->second;
       if(score != 0) maxheap.push_back(score);
       push_heap(maxheap.begin(), maxheap.end());
       if(maxheap.size() > (int)(.0005 * blastscores->size())){
@@ -125,19 +126,29 @@ void applyAlpha(double a, vector<D_alpha>& scores, blastmap* blastscores)
     }
   }
 
+  double maxScore = -1;
   for(auto it = scores.begin(); it != scores.end(); it++){
-    double topo = it->get_da();
     double seq;
-    if(blastscores==NULL) seq = 0;
-    else if(blastscores->find(make_pair(it->get_n1(), it->get_n2())) == blastscores->end()) seq = topo;
-    else seq = blastscores->at(make_pair(it->get_n1(), it->get_n2()));
-    it->update_da(a*topo + (1.0-a)*seq, seq);
+    auto d = blastscores->find(make_pair(it->get_n1(), it->get_n2()));
+    if(d != blastscores->end()){
+      seq = d->second;
+      if(seq > b) seq = b;
+      if(seq > maxScore) maxScore = seq;
+    }else seq = b;
+    it->set_seq(seq);
+  }
+
+  for(auto it = scores.begin(); it != scores.end(); it++){
+    double seq = it->get_ds();
+    if(seq < b) it->set_seq(seq/maxScore);
+    else it->set_seq(1.1);
+    it->update_da(a);
   }
 }
 
 //Calculates and writes all D_topo values from the given spectral signature files
 //Returns 
-vector<D_alpha> getDistances(string file1, string file2, string outputname, double a, blastmap* blastscores, int numP)
+vector<D_alpha> getDistances(string file1, string file2, string outputname, double a, double b, blastmap* blastscores, int numP)
 {
   ptime t = bclock::local_time();
   cout << "loading sigs file: " << file1 << "\n";
@@ -182,7 +193,7 @@ vector<D_alpha> getDistances(string file1, string file2, string outputname, doub
     delete[] results[i];
   }
 
-  applyAlpha(a, allDistances, blastscores);
+  applyAlpha(a, b, allDistances, blastscores);
 
   /*ofstream dout((outputname + ".densities").c_str());
   for(spectramap::iterator it1 = m1.begin(); it1 != m1.end(); ++it1)

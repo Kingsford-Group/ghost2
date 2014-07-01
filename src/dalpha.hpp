@@ -11,7 +11,8 @@ class D_alpha
     string get_n2() {return n2;};
     double get_da() {return d;};
     double get_ds() {return s;};
-    void update_da(double n, double m) {d=n;s=m;};
+    void update_da(double a) {d = a*d + (1.0-a)*s;};
+    void set_seq(double m) {s=m;};
 };
 class CompareD_alphaG
 {

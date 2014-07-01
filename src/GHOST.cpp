@@ -14,6 +14,35 @@
 using std::string;
 using std::cout;
 
+bmap readAlignment(string file)
+{
+  bmap result;
+  ifstream fin(file);
+  char c = fin.get();
+  int alen = 0;
+  int blen = 0;
+  char a[128];
+  char b[128];
+  bool fillinga = true;
+  while(fin.good()){
+    if(c == '\n'){
+      b[blen] = '\0';
+      result.insert(bmap::value_type(string(a), string(b)));
+      alen = blen = 0;
+      fillinga = true;
+    }
+    else if(c == '\r'){}
+    else if (c == '\t'){
+      a[alen] = '\0';
+      fillinga = false;
+    }
+    else if(fillinga) a[alen++] = c;
+    else b[blen++] = c;
+    c = fin.get();
+  }
+  return result;
+}
+
 void computeAlignment(ConfigData c)
 {
   // read in graph
@@ -29,6 +58,22 @@ void computeAlignment(ConfigData c)
   else if(c.Hgraph.substr(c.Hgraph.size()-4) == ".net")
     H = readFromNet(c.Hgraph);
   else {cout << "bad extension: " << c.Hgraph << "\n"; exit(0);}
+
+  if(c.AlignFile != "")
+  {
+    bmap align = readAlignment(c.AlignFile);
+    printICS(G, H, align);
+
+    // get evalues if given
+    blastMap *evals = new blastMap;
+    if(c.SeqScores == "")
+      evals = NULL;
+    else
+      *evals = getBlastMap(c.SeqScores);
+    localImprove(G, H, evals, &align, c.searchiter, c.ratio);
+    printICS(G, H, align);
+    return;
+  }
 
   // compute spectral signatures
   if(c.Gsigs == "")
@@ -53,11 +98,11 @@ void computeAlignment(ConfigData c)
   // compute distances
   vector<D_alpha> dist = 
     getDistances(c.Gsigs, c.Hsigs, (G.getName()+"_vs_"+H.getName()+".sdf"), 
-                 c.alpha, evals , c.numProcessors);
+                 c.alpha, c.beta, evals , c.numProcessors);
   if(c.dumpDistances) { delete evals; return; }// if user wanted just the distances...
 
   // align graphs
-  bmap f = alignGraphs(G, H, dist, c.beta, c.nneighbors);
+  bmap f = alignGraphs(G, H, dist, c.nneighbors);
   localImprove(G, H, evals, &f, c.searchiter, c.ratio);
   printICS(G, H, f);
   delete evals;

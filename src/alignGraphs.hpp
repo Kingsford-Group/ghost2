@@ -41,7 +41,7 @@ distmap getDistMap(vector<D_alpha>& v)
  * while minP not empty, 
  *  pop D_alpha d
  *  if no part of d in f, GreedyQAPEXtend(G,H,d,f) */
-bmap seedAndExtend(Graph& G, Graph& H, vector<D_alpha>& minP, double beta, int k)
+bmap seedAndExtend(Graph& G, Graph& H, vector<D_alpha>& minP, int k)
 {
   vector<D_alpha> allDists(minP);
   distmap dmap = getDistMap(allDists);
@@ -55,7 +55,7 @@ bmap seedAndExtend(Graph& G, Graph& H, vector<D_alpha>& minP, double beta, int k
     string n1 = d.get_n1();
     string n2 = d.get_n2();
     if(isNotUsed(n1,n2,&f))
-      extendAlignment(d, G, H, &f, allDists, dmap, beta, k);
+      extendAlignment(d, G, H, &f, allDists, dmap, k);
   }
   return f;
 }
@@ -145,7 +145,7 @@ void printICS(Graph& G, Graph& H, bmap& result)
   cout << "ICS = " << ics << "\%\n";
 }
 
-bmap alignGraphs(Graph& G, Graph& H, vector<D_alpha>& distances, double beta, int k)
+bmap alignGraphs(Graph& G, Graph& H, vector<D_alpha>& distances, int k)
 {
   cout << "aligning graphs...\n";
   vector<D_alpha> minP;  // empty vector is a heap
@@ -156,7 +156,7 @@ bmap alignGraphs(Graph& G, Graph& H, vector<D_alpha>& distances, double beta, in
   }
 
   ptime t = bclock::local_time();
-  bmap result = seedAndExtend(G, H, minP, beta, k);
+  bmap result = seedAndExtend(G, H, minP, k);
   cout << "aligned graphs in " << (bclock::local_time()-t).total_milliseconds() << " milliseconds\n";
 
   printICS(G, H, result);

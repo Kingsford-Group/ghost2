@@ -124,13 +124,10 @@ vector<D_alpha> performMatching(vector<D_alpha>& matches){
 }
 
 //Filter the matches with D_seq>beta
-struct checkBeta {
-  checkBeta(double b) : b(b) {}
-  bool operator()(D_alpha d) { return d.get_ds() > b; }
-  private: double b;};
+bool checkSeq(D_alpha d) { return d.get_ds() <= 1; }
 
 //Algorithm2: from a seed pair, extend the alignment locally
-void extendAlignment(D_alpha seed, Graph& g1, Graph& g2, bmap *alignment, vector<D_alpha>& dalphas, distmap& d, double beta, int k)
+void extendAlignment(D_alpha seed, Graph& g1, Graph& g2, bmap *alignment, vector<D_alpha>& dalphas, distmap& d, int k)
 {
   vector<D_alpha> maxP;
   maxP.push_back(seed);
@@ -152,7 +149,7 @@ void extendAlignment(D_alpha seed, Graph& g1, Graph& g2, bmap *alignment, vector
     //Do the alignment problem
     matches = performMatching(matches);
     //Filter out matches that are already aligned or have D_seq>beta
-    remove_if(matches.begin(), matches.end(), checkBeta(beta));
+    remove_if(matches.begin(), matches.end(), checkSeq);
     //cout << "aligned " << matches.size() << " nodes\n";
 
     for(auto it = matches.begin(); it != matches.end(); ++it){
