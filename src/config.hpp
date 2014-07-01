@@ -8,7 +8,7 @@ struct ConfigData
 {
   string Ggraph="", Hgraph="",
          Gsigs="", Hsigs="",
-         SeqScores="", AlignFile="";
+         SeqScores="", AlignFile="", DistFile="";
   int numProcessors=-1,
       hops=4,
       nneighbors=-1, // dummy for all
@@ -28,9 +28,9 @@ void ConfigData::use(string s)
   string pos[] = {"network1: ", "network2: ", "sigs1: ", "sigs2: ",
                   "sequencescores: ", "nneighbors: ", "searchiter: ",
                   "hops: ", "processors: ", "alpha: ", "beta: ", "ratio: ", 
-                  "dumpSignatures: ", "dumpDistances: ", "alignFile: "};
+                  "dumpSignatures: ", "dumpDistances: ", "alignFile: ", "distFile: "};
   bool used=false;
-  for(int i=0;i<15;i++)
+  for(int i=0;i<16;i++)
     if(s.size() > pos[i].size() && s.substr(0,pos[i].size()) == pos[i])
     {
       s = s.substr(pos[i].size());
@@ -53,6 +53,7 @@ void ConfigData::use(string s)
         case 12: if(s=="true") dumpSignatures=true; break;
         case 13: if(s=="true") dumpDistances=true; break;
         case 14: AlignFile = s; break;
+        case 15: DistFile = s; break;
         default: break;
       }
     }

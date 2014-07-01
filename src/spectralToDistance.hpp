@@ -91,16 +91,16 @@ void distanceWorker(spectramap::value_type n, spectramap* m2,
   *out = res.str();
 }
 
-void applyAlpha(double a, double b, vector<D_alpha>& scores, blastmap* blastscores)
+void applyAlpha(double a, double b, vector<D_alpha> *scores, blastmap* blastscores)
 {
   if(!blastscores) return;
 
   if(a == -1){
     vector<double> maxheap;
-    for(auto it = scores.begin(); it != scores.end(); it++){
+    for(auto it = scores->begin(); it != scores->end(); it++){
       if(it->get_da() != 0) maxheap.push_back(it->get_da());
       push_heap(maxheap.begin(), maxheap.end());
-      if(maxheap.size() > (int)(.0005 * scores.size())){
+      if(maxheap.size() > (int)(.0005 * scores->size())){
         pop_heap(maxheap.begin(), maxheap.end());
         maxheap.pop_back();
       }
@@ -108,7 +108,7 @@ void applyAlpha(double a, double b, vector<D_alpha>& scores, blastmap* blastscor
     double structval = maxheap.front();
 
     maxheap.clear();
-    for(auto it = scores.begin(); it != scores.end(); it++){
+    for(auto it = scores->begin(); it != scores->end(); it++){
       auto sc = blastscores->find(make_pair(it->get_n1(), it->get_n2()));
       if(sc == blastscores->end()) continue;
       double score = sc->second;
@@ -127,7 +127,7 @@ void applyAlpha(double a, double b, vector<D_alpha>& scores, blastmap* blastscor
   }
 
   double maxScore = -1;
-  for(auto it = scores.begin(); it != scores.end(); it++){
+  for(auto it = scores->begin(); it != scores->end(); it++){
     double seq;
     auto d = blastscores->find(make_pair(it->get_n1(), it->get_n2()));
     if(d != blastscores->end()){
@@ -138,7 +138,7 @@ void applyAlpha(double a, double b, vector<D_alpha>& scores, blastmap* blastscor
     it->set_seq(seq);
   }
 
-  for(auto it = scores.begin(); it != scores.end(); it++){
+  for(auto it = scores->begin(); it != scores->end(); it++){
     double seq = it->get_ds();
     if(seq < b) it->set_seq(seq/maxScore);
     else it->set_seq(1.1);
@@ -193,7 +193,7 @@ vector<D_alpha> getDistances(string file1, string file2, string outputname, doub
     delete[] results[i];
   }
 
-  applyAlpha(a, b, allDistances, blastscores);
+  applyAlpha(a, b, &allDistances, blastscores);
 
   /*ofstream dout((outputname + ".densities").c_str());
   for(spectramap::iterator it1 = m1.begin(); it1 != m1.end(); ++it1)
@@ -205,3 +205,41 @@ vector<D_alpha> getDistances(string file1, string file2, string outputname, doub
   return allDistances;
 }
 
+vector<D_alpha> getDistancesFromFile(string file, double alpha, double beta, blastmap* blastscores)
+{
+  cout << "reading distances from " << file << "\n";
+  vector<D_alpha> allDistances;
+
+  ifstream fin(file);
+  char c = fin.get();
+  int alen = 0;
+  int blen = 0;
+  int dlen = 0;
+  char a[128];
+  char b[128];
+  char d[128];
+  int filling = 0;
+  while(fin.good()){
+    if(c == '\n'){
+      d[dlen] = '\0';
+      allDistances.push_back(D_alpha(string(a), string(b), atof(d)));
+      alen = blen = dlen = 0;
+      filling = 0;
+    }
+    else if(c == '\r'){}
+    else if (c == '\t'){
+      if(filling == 0) a[alen] = '\0';
+      else if(filling == 1) b[blen] = '\0';
+      filling++;
+    }
+    else if(filling == 0) a[alen++] = c;
+    else if(filling == 1) b[blen++] = c;
+    else d[dlen++] = c;
+    c = fin.get();
+  }
+
+  applyAlpha(alpha, beta, &allDistances, blastscores);
+  cout << "finished reading " << allDistances.size() << " distances\n";
+
+  return allDistances;
+}

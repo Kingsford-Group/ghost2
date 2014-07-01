@@ -75,6 +75,9 @@ void computeAlignment(ConfigData c)
     return;
   }
 
+  vector<D_alpha> dist;
+
+  if(c.DistFile == ""){
   // compute spectral signatures
   if(c.Gsigs == "")
   {
@@ -87,6 +90,7 @@ void computeAlignment(ConfigData c)
     c.Hsigs = (H.getName() + ".sig.gz");
   }
   if(c.dumpSignatures) return; // if user only wanted sigs
+  }
 
   // get evalues if given
   blastMap *evals = new blastMap;
@@ -95,11 +99,15 @@ void computeAlignment(ConfigData c)
   else
     *evals = getBlastMap(c.SeqScores);
 
+  if(c.DistFile == ""){
   // compute distances
-  vector<D_alpha> dist = 
+  dist = 
     getDistances(c.Gsigs, c.Hsigs, (G.getName()+"_vs_"+H.getName()+".sdf"), 
                  c.alpha, c.beta, evals , c.numProcessors);
   if(c.dumpDistances) { delete evals; return; }// if user wanted just the distances...
+  }else{
+    dist = getDistancesFromFile(c.DistFile, c.alpha, c.beta, evals);
+  }
 
   // align graphs
   bmap f = alignGraphs(G, H, dist, c.nneighbors);
