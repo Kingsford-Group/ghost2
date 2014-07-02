@@ -64,14 +64,6 @@ double DTopo(LevelInfo *v1, LevelInfo *v2, int s)
   return dist/s;
 }
 
-//Calculates the average density for the node
-/*double avgDensity(vector<LevelInfo> levels)
-{
-  double total=0;
-  for(int i=0; i<levels.size(); i++) total += levels[i].density;
-  return total / levels.size();
-}*/
-
 //Calculates the D_alphas from node n to all nodes in m2
 void distanceWorker(spectramap::value_type n, spectramap* m2, 
     D_alpha** result, string* out, ProgressBar *pbar)
@@ -195,12 +187,6 @@ vector<D_alpha> getDistances(string file1, string file2, string outputname, doub
 
   applyAlpha(a, b, &allDistances, blastscores);
 
-  /*ofstream dout((outputname + ".densities").c_str());
-  for(spectramap::iterator it1 = m1.begin(); it1 != m1.end(); ++it1)
-    dout << it1->first << "\t" << avgDensity(it1->second) << "\n";
-  for(spectramap::iterator it2 = m2.begin(); it2 != m2.end(); ++it2) 
-    dout << it2->first << "\t" << avgDensity(it2->second) << "\n";
-  dout.close();*/
   out.close();
   return allDistances;
 }

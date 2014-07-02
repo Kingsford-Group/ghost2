@@ -43,6 +43,18 @@ bmap readAlignment(string file)
   return result;
 }
 
+void printMap2(vector<D_alpha> &f, string filename)
+{
+  ofstream fout (filename);
+  auto iter = f.begin(),
+  iend = f.end();
+  for(; iter != iend; ++iter)
+  {
+    fout << iter->get_n1() << "\t" << iter->get_n2() << "\n";
+  }
+  fout.close();
+}
+
 void computeAlignment(ConfigData c)
 {
   // read in graph
@@ -108,6 +120,14 @@ void computeAlignment(ConfigData c)
   }else{
     dist = getDistancesFromFile(c.DistFile, c.alpha, c.beta, evals);
   }
+
+ /* cout << "starting alignment\n";
+  vector<D_alpha> ans = performMatching(dist);
+  cout << "done, writing results\n";
+  string file = G.getName() + "_vs_" + H.getName() + ".af";
+  printMap2(ans, file);
+  bmap align = readAlignment(file);
+  printICS(G, H, align);*/
 
   // align graphs
   bmap f = alignGraphs(G, H, dist, c.nneighbors);

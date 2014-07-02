@@ -26,7 +26,7 @@ void insertIfBetter(bmap* alignment, D_alpha best, distmap& dalphas)
   if((left == alignment->left.end() || 
       d < dalphas.at(make_pair(left->first,left->second)).get_da())
       && (right == alignment->right.end() || 
-      d < dalphas.at(make_pair(right->first,right->second)).get_da())){
+      d < dalphas.at(make_pair(right->second,right->first)).get_da())){
     //Remove any existing alignments, add this one
     alignment->left.erase(best.get_n1());
     alignment->right.erase(best.get_n2());
@@ -124,7 +124,7 @@ vector<D_alpha> performMatching(vector<D_alpha>& matches){
 }
 
 //Filter the matches with D_seq>beta
-bool checkSeq(D_alpha d) { return d.get_ds() <= 1; }
+bool checkSeq(D_alpha d) { return d.get_ds() > 1; }
 
 //Algorithm2: from a seed pair, extend the alignment locally
 void extendAlignment(D_alpha seed, Graph& g1, Graph& g2, bmap *alignment, vector<D_alpha>& dalphas, distmap& d, int k)
@@ -149,10 +149,10 @@ void extendAlignment(D_alpha seed, Graph& g1, Graph& g2, bmap *alignment, vector
     //Do the alignment problem
     matches = performMatching(matches);
     //Filter out matches that are already aligned or have D_seq>beta
-    remove_if(matches.begin(), matches.end(), checkSeq);
+    auto end = remove_if(matches.begin(), matches.end(), checkSeq);
     //cout << "aligned " << matches.size() << " nodes\n";
 
-    for(auto it = matches.begin(); it != matches.end(); ++it){
+    for(auto it = matches.begin(); it != end; ++it){
       alignment->insert(bmap::value_type(it->get_n1(), it->get_n2()));
       maxP.push_back(*it);
       push_heap(maxP.begin(), maxP.end(), CompareD_alphaL());
