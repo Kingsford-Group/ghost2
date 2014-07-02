@@ -62,7 +62,7 @@ The configuration file must have [main] as its first line and must include value
   sigs1 - The .sig.gz file containing the precomputed signatures for network1.
   sigs2 - The .sig.gz file containing the precomputed signatures for network2.
   sequencescores - The .evalues file containing the precomputed BLAST evalues.
-  distanceFile -The .sdf file containing the precomputed distances.
+  distFile - The .sdf file containing the precomputed distances.
   processors - The positive integer value for the number of processors to use. 
                If this is not set, GHOST will automatically generate what 
                should be the optimal value.
