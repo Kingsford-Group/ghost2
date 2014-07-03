@@ -82,7 +82,7 @@ void computeAlignment(ConfigData c)
       evals = NULL;
     else
       *evals = getBlastMap(c.SeqScores);
-    localImprove(G, H, evals, &align, c.searchiter, c.ratio);
+    localImprove(G, H, evals, &align, c.searchiter, c.ratio, c.numProcessors);
     printICS(G, H, align);
     return;
   }
@@ -131,7 +131,7 @@ void computeAlignment(ConfigData c)
 
   // align graphs
   bmap f = alignGraphs(G, H, dist, c.nneighbors);
-  localImprove(G, H, evals, &f, c.searchiter, c.ratio);
+  localImprove(G, H, evals, &f, c.searchiter, c.ratio, c.numProcessors);
   printICS(G, H, f);
   delete evals;
   printMap(f, G.getName(), H.getName());

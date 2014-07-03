@@ -27,6 +27,8 @@ class Graph
       {if(m.find(v)==m.end()) {std::cout<<"error: .sig.gz may be incorrect\n";
                                exit(0);}
        else return m[v];};
+    vlist* neighbors2(string v) {
+       return &m[v];};
     void print();
 };
 
