@@ -14,7 +14,7 @@ struct ConfigData
       nneighbors=-1, // dummy for all
       searchiter = 10; // not sure
   double alpha=-1.0,
-         beta=100,
+         beta=1.0,
          ratio=8.0; // not sure
   bool dumpSignatures=false,
        dumpDistances=false;

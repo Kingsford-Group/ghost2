@@ -62,6 +62,7 @@ The configuration file must have [main] as its first line and must include value
   sigs1 - The .sig.gz file containing the precomputed signatures for network1.
   sigs2 - The .sig.gz file containing the precomputed signatures for network2.
   sequencescores - The .evalues file containing the precomputed BLAST evalues.
+  distFile - The .sdf file containing the precomputed distances.
   processors - The positive integer value for the number of processors to use. 
                If this is not set, GHOST will automatically generate what 
                should be the optimal value.
@@ -72,7 +73,15 @@ The configuration file must have [main] as its first line and must include value
           written in decimal format (ex. 0.5). If no user-suggested alpha is 
           provided, GHOST will generate one as defined in the paper.
   beta - The positive decimal value for the hard constraint on sequence 
-         similarity of aligned pairs. The default value is 100.
+         similarity of aligned pairs. The default value is 1.0.
+  ratio - The positive decimal value for the ratio of "bad-moves" allowed
+          during the local-searh phase of the alignment algorithm. This is
+          equivalent to the "budget" parameter described in the GHOST paper.
+          The default value is 8.0.
+  searchiter - The positive integer value for the number of local search
+               iterations that should be performed after the initial alignment
+               is complete. The process will terminate early if the last loop
+               yielded no changes. The default value is 10.
   dumpSignatures - The boolean value (true or false) for whether you want the 
                    computation to stop after computing the signatures. Note 
                    that the boolean values are lower case. The default value 
