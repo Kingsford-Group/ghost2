@@ -60,15 +60,15 @@ void computeAlignment(ConfigData c)
   // read in graph
   Graph G,H;
   if(c.Ggraph.substr(c.Ggraph.size()-5) == ".gexf")
-    G = readFromGexf(c.Ggraph);
+    G = readFromGexf(c.Ggraph, c.directed);
   else if(c.Ggraph.substr(c.Ggraph.size()-4) == ".net")
-    G = readFromNet(c.Ggraph);
+    G = readFromNet(c.Ggraph, c.directed);
   else {cout << "bad extension: " << c.Ggraph << "\n"; exit(0);}
 
   if(c.Hgraph.substr(c.Hgraph.size()-5) == ".gexf")
-    H = readFromGexf(c.Hgraph);
+    H = readFromGexf(c.Hgraph, c.directed);
   else if(c.Hgraph.substr(c.Hgraph.size()-4) == ".net")
-    H = readFromNet(c.Hgraph);
+    H = readFromNet(c.Hgraph, c.directed);
   else {cout << "bad extension: " << c.Hgraph << "\n"; exit(0);}
 
   if(c.AlignFile != "")
@@ -97,13 +97,29 @@ void computeAlignment(ConfigData c)
     computeSpectralSignatures(&G, c.hops, c.numProcessors);
     c.Gsigs = (G.getName() + ".sig.gz");
   }
+  else if(c.Gsigs != (G.getName() + ".sig.gz"))
+  {
+    cout << "file: " << c.Gsigs << " does match the network file name.\n" <<
+      "please correct before continuing.";
+    exit(0);
+  }
   if(c.Hsigs == "")
   {
     computeSpectralSignatures(&H, c.hops, c.numProcessors);
     c.Hsigs = (H.getName() + ".sig.gz");
   }
+  else if(c.Hsigs != (H.getName() + ".sig.gz"))
+  {
+    cout << "file: " << c.Hsigs << " does match the network file name.\n" <<
+      "please correct before continuing.";
+    exit(0);
+  }
+
   if(c.dumpSignatures) return; // if user only wanted sigs
   }
+
+  // undirect for later steps
+  G.direct(false); H.direct(false);
 
   // get evalues if given
   blastMap *evals = new blastMap;
@@ -117,7 +133,8 @@ void computeAlignment(ConfigData c)
   dist = 
     getDistances(c.Gsigs, c.Hsigs, (G.getName()+"_vs_"+H.getName()+".sdf"), 
                  c.alpha, c.beta, evals , c.numProcessors);
-  if(c.dumpDistances) { delete evals; return; }// if user wanted just the distances...
+  // if user wanted just the distances...
+  if(c.dumpDistances) { delete evals; return; }
   }else{
     dist = getDistancesFromFile(c.DistFile, c.alpha, c.beta, evals);
   }

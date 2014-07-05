@@ -16,19 +16,22 @@ typedef boost::unordered_map<string, vlist> adjacencyMap;
 class Graph
 {
   adjacencyMap m;
+  adjacencyMap dm;
+  bool directed;
   string name;
   public:
     void setName(string s) {name=s;};
     string getName() {return name;};
     void addVertex(string v) {vlist e; m[v]=e;};
-    void addEdge(string v1, string v2) {m[v1].insert(v2); m[v2].insert(v1);};
+    void addEdge(string v1, string v2) 
+      {m[v1].insert(v2); m[v2].insert(v1);
+       if(directed) {dm[v1].insert(v2);}};
     vector<string> nodes();
     vlist neighbors(string v) 
-      {if(m.find(v)==m.end()) {std::cout<<"error: .sig.gz may be incorrect\n";
-                               exit(0);}
+      {if(directed) return dm[v];
        else return m[v];};
-    vlist* neighbors2(string v) {
-       return &m[v];};
+    vlist* neighbors2(string v) {return &m[v];};
+    void direct(bool d) {directed=d;};
     void print();
 };
 
@@ -44,8 +47,6 @@ vector<string> Graph::nodes()
 
 void Graph::print()
 {
-  // need to change to work with the vlist
-  // also check if GHOST still works
   adjacencyMap::iterator iter = m.begin(),
   iend = m.end();
   for(; iter != iend; ++iter)

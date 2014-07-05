@@ -122,10 +122,11 @@ void getEdges(ifstream *fin, Graph *target, idtoval *itv)
 }
 
 /* returns the adjacency list stored in fileName */
-Graph readFromGexf(string fileName)
+Graph readFromGexf(string fileName, bool directed)
 {
   ptime t = bclock::local_time();
   Graph result;
+  result.direct(directed);
   idtoval itv;
   ifstream fin(fileName);
   if(!fin.good()) {cout << "error loading file: " << fileName << "\n"; exit(0);}

@@ -17,7 +17,8 @@ struct ConfigData
          beta=1.0,
          ratio=8.0; // not sure
   bool dumpSignatures=false,
-       dumpDistances=false;
+       dumpDistances=false,
+       directed=false;
   void use(string s);
   void configure(string filename);
   void print();
@@ -29,9 +30,10 @@ void ConfigData::use(string s)
   string pos[] = {"network1: ", "network2: ", "sigs1: ", "sigs2: ",
                   "sequencescores: ", "nneighbors: ", "searchiter: ",
                   "hops: ", "processors: ", "alpha: ", "beta: ", "ratio: ", 
-                  "dumpSignatures: ", "dumpDistances: ", "alignFile: ", "distFile: "};
+                  "dumpSignatures: ", "dumpDistances: ", "directed: ",
+                  "alignFile: ", "distFile: "};
   bool used=false;
-  for(int i=0;i<16;i++)
+  for(int i=0;i<17;i++)
     if(s.size() > pos[i].size() && s.substr(0,pos[i].size()) == pos[i])
     {
       s = s.substr(pos[i].size());
@@ -53,8 +55,9 @@ void ConfigData::use(string s)
         case 11: ratio = atof(s.c_str()); break;
         case 12: if(s=="true") dumpSignatures=true; break;
         case 13: if(s=="true") dumpDistances=true; break;
-        case 14: AlignFile = s; break;
-        case 15: DistFile = s; break;
+        case 14: if(s=="true") directed=true; break;
+        case 15: AlignFile = s; break;
+        case 16: DistFile = s; break;
         default: break;
       }
     }

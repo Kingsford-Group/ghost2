@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <tgmath.h>
+#include <stdlib.h>
 
 #include <boost/unordered_map.hpp>
 #include <boost/thread.hpp>
@@ -197,6 +198,7 @@ vector<D_alpha> getDistancesFromFile(string file, double alpha, double beta, bla
   vector<D_alpha> allDistances;
 
   ifstream fin(file);
+  if(!fin.good()) {cout << ".sig.gz file" << file << "not found\n"; exit(0);}
   char c = fin.get();
   int alen = 0;
   int blen = 0;
