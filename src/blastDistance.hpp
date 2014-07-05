@@ -1,4 +1,6 @@
 #include <string>
+#include <iostream>
+#include <stdlib.h>
 #include <boost/unordered_map.hpp>
 #include <utility>
 #include <iostream>
@@ -14,6 +16,7 @@ blastMap getBlastMap(string filename)
 {
   blastMap bevals;
   ifstream fin (filename);
+  if(!fin.good()) {std::cout << "sequencescores file is bad\n"; exit(0);}
   while(1)
   {
     string n1,n2;

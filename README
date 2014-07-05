@@ -63,6 +63,7 @@ The configuration file must have [main] as its first line and must include value
   sigs2 - The .sig.gz file containing the precomputed signatures for network2.
   sequencescores - The .evalues file containing the precomputed BLAST evalues.
   distFile - The .sdf file containing the precomputed distances.
+  alignFile - The .af file containing the precomputed alignment.
   processors - The positive integer value for the number of processors to use. 
                If this is not set, GHOST will automatically generate what 
                should be the optimal value.
@@ -137,8 +138,8 @@ First, make a config file in the folder (see file formats).
 GHOST has the following options:
 
   -c    This option accepts the path to the configuration file as an argument. It should almost always be present when you run the program.
-  -p    This option accepts the number of processors it should use as an argument. It is recommended that this is not set because the program automatically generates what should be the optimal number of processors.
-  -k    This option accepts the radius from the each node the spectral signature should be computed. The default value is 4.
+  -p    This option accepts the number of processors it should use as an argument. It is recommended that this is not set because the program automatically generates what should be the optimal number of processors. This can be set in the .cfg file.
+  -k    This option accepts the radius from the each node the spectral signature should be computed. The default value is 4. This can be set in the .cfg file.
 
 A example of an ordinary run is:
 
