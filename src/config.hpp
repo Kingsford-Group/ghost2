@@ -25,6 +25,7 @@ struct ConfigData
 
 void ConfigData::use(string s)
 {
+  if(s.substr(0, 2) == "//") return;
   string pos[] = {"network1: ", "network2: ", "sigs1: ", "sigs2: ",
                   "sequencescores: ", "nneighbors: ", "searchiter: ",
                   "hops: ", "processors: ", "alpha: ", "beta: ", "ratio: ", 

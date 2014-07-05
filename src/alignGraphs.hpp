@@ -108,7 +108,7 @@ bmap alignGraphs(Graph& G, Graph& H, vector<D_alpha>& distances, int k)
 
   ptime t = bclock::local_time();
   bmap result = seedAndExtend(G, H, minP, k);
-  cout << "aligned graphs in " << (bclock::local_time()-t).total_milliseconds() << " milliseconds\n";
+  cout << "aligned " << result.size() << " nodes in " << (bclock::local_time()-t).total_milliseconds() << " milliseconds\n";
 
   printICS(G, H, result);
   return result;

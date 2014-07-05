@@ -75,15 +75,16 @@ void computeAlignment(ConfigData c)
   {
     bmap align = readAlignment(c.AlignFile);
     printICS(G, H, align);
-
-    // get evalues if given
-    blastMap *evals = new blastMap;
-    if(c.SeqScores == "")
-      evals = NULL;
-    else
-      *evals = getBlastMap(c.SeqScores);
-    localImprove(G, H, evals, &align, c.searchiter, c.ratio, c.numProcessors);
-    printICS(G, H, align);
+    if(c.searchiter != 0){
+      // get evalues if given
+      blastMap *evals = new blastMap;
+      if(c.SeqScores == "")
+        evals = NULL;
+      else
+        *evals = getBlastMap(c.SeqScores);
+      localImprove(G, H, evals, &align, c.searchiter, c.ratio, c.numProcessors);
+      printICS(G, H, align);
+    }
     return;
   }
 
