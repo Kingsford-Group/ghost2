@@ -5,11 +5,12 @@
 #include "Eigen/Dense"
 #include "Eigen/Eigenvalues"
 #include "graph.hpp"
+#include "sigApprox.hpp"
 
 using std::vector;
 using namespace Eigen;
 typedef boost::unordered_map<string, int> degMap;
-typedef boost::unordered_map<string, vlist> neighborhood;
+typedef boost::unordered_map<string, vlist*> neighborhood;
 
 class AdjacencyMatrix
 {
@@ -24,6 +25,8 @@ class AdjacencyMatrix
     vlist getNodes() {return nodes;};
     vector<string> getPrev() {return prev;};
     vector<double> getEigen();
+    vector<double> rayleighEigen();
+    vector<double> inverseEigen();
     double getDensity() {return (double)(nvert) / nedge;};
 };
 
@@ -33,24 +36,24 @@ void AdjacencyMatrix::extend(Graph *input, string source)
   {
     nodes.insert(source);
     prev.push_back(source);
-    neighborhoods[source] = (*input).neighbors(source);
+    neighborhoods[source] = (*input).neighbors2(source);
     dmap[source] = 0;
   }
 
   vector<string> next;
   for(int i=0;i<prev.size();i++)
   {
-    vlist::iterator vit = neighborhoods[prev[i]].begin(), 
-                    vend = neighborhoods[prev[i]].end();
+    vlist::iterator vit = (*(neighborhoods[prev[i]])).begin(), 
+                    vend = (*(neighborhoods[prev[i]])).end();
     for(; vit != vend; vit++)
       if(nodes.find(*vit) == nodes.end())
       {
         nodes.insert(*vit);
         next.push_back(*vit);
-        neighborhoods[*vit] = (*input).neighbors(*vit);
+        neighborhoods[*vit] = (*input).neighbors2(*vit);
         dmap[*vit] = 0;
-        vlist neighbors = (*input).neighbors(*vit);
-        vlist::iterator it = neighbors.begin(), iend = neighbors.end();
+        vlist *neighbors = (*input).neighbors2(*vit);
+        vlist::iterator it = (*neighbors).begin(), iend = (*neighbors).end();
         for(; it != iend; it++)
           if(nodes.find(*it) != nodes.end())
           {
@@ -77,7 +80,8 @@ void AdjacencyMatrix::extend(Graph *input, string source)
           m(c1,c2) = 1;
         else
         {
-          if(neighborhoods[*it1].find(*it2) != neighborhoods[*it1].end())
+          if((*(neighborhoods[*it1])).find(*it2) != 
+             (*(neighborhoods[*it1])).end())
             m(c1,c2) = -1. / sqrt(dmap[*it1] * dmap[*it2]);
           else
             m(c1,c2) = 0;
@@ -95,8 +99,45 @@ vector<double> AdjacencyMatrix::getEigen()
   vector<double> v;
   if(nodes.size() == 0)
     return v;
-  VectorXd evals = m.selfadjointView<Eigen::Upper>().eigenvalues();
+  SelfAdjointEigenSolver<MatrixXd> es(m, EigenvaluesOnly);
+  VectorXd evals = es.eigenvalues();
+//  VectorXd evals = m.selfadjointView<Eigen::Upper>().eigenvalues();
   for(int i=0; i<evals.rows(); i++)
     v.push_back(evals(i));
   return v;
+}
+
+vector<double> AdjacencyMatrix::rayleighEigen()
+{
+  vector<double> result;
+  return result;
+  int tries = 30;
+  for(int i=0;i<tries;i++)
+  {
+    double d = rayleigh(&m);
+    bool found=false;
+    for(int i=0;i<result.size();i++)
+      if(fabs(d-result[i])<ZERO)
+        found=true;
+    if(!found) result.push_back(d);
+  }
+  return result;
+}
+
+// deemed to slow.
+vector<double> AdjacencyMatrix::inverseEigen()
+{
+  vector<double> result;
+  int tries = 10;
+  double mu = 1.0/(tries+1);
+  for(int i=1;i<=tries;i++)
+  {
+    double d = inverseIter(&m, 2*mu*i);
+    bool found=false;
+    for(int i=0;i<result.size();i++)
+      if(fabs(d-result[i])<ZERO)
+        found=true;
+    if(!found) result.push_back(d);
+  }
+  return result;
 }

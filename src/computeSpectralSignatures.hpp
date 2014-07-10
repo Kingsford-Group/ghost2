@@ -23,6 +23,8 @@ void spectrum(Graph *input, int numHops, string source,
   {
     m.extend(input, source);
     (*output).push_back(LevelData(m.getPrev(), m.getEigen(), m.getDensity()));
+//    (*output).push_back(LevelData(m.getPrev(), m.rayleighEigen(), m.getDensity()));
+//    (*output).push_back(LevelData(m.getPrev(), m.inverseEigen(), m.getDensity()));
   }
   (*p).update();
 }
