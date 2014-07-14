@@ -4,7 +4,6 @@
 #include <boost/unordered_map.hpp>
 #include <boost/bimap/bimap.hpp>
 #include <boost/bimap/unordered_set_of.hpp>
-#include <boost/bimap/list_of.hpp>
 #include "graph.hpp"
 #include "hungarian.hpp"
 

@@ -97,22 +97,34 @@ void computeAlignment(ConfigData c)
     computeSpectralSignatures(&G, c.hops, c.numProcessors);
     c.Gsigs = (G.getName() + ".sig.gz");
   }
-  else if(c.Gsigs != (G.getName() + ".sig.gz"))
+  else
   {
-    cout << "file: " << c.Gsigs << " does match the network file name.\n" <<
+    unsigned start = c.Gsigs.find_last_of("/");
+    if(start == string::npos) start = -1;
+    string name = c.Gsigs.substr(start+1);
+    if(name != (G.getName() + ".sig.gz"))
+    {
+      cout << "file: " << c.Gsigs << " does match the network file name.\n" <<
       "please correct before continuing.";
-    exit(0);
+      exit(0);
+    }
   }
   if(c.Hsigs == "")
   {
     computeSpectralSignatures(&H, c.hops, c.numProcessors);
     c.Hsigs = (H.getName() + ".sig.gz");
   }
-  else if(c.Hsigs != (H.getName() + ".sig.gz"))
+  else 
   {
-    cout << "file: " << c.Hsigs << " does match the network file name.\n" <<
+    unsigned start = c.Hsigs.find_last_of("/");
+    if(start == string::npos) start = -1;
+    string name = c.Hsigs.substr(start+1);
+    if(name != (H.getName() + ".sig.gz"))
+    {
+      cout << "file: " << c.Hsigs << " does match the network file name.\n" <<
       "please correct before continuing.";
-    exit(0);
+      exit(0);
+    }
   }
 
   if(c.dumpSignatures) return; // if user only wanted sigs
