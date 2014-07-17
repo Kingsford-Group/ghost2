@@ -14,6 +14,7 @@ class ProgressBar
   boost::mutex mutex;
   public:
     ProgressBar(int i, ptime awastin) {max=i; time = awastin;};
+    ProgressBar(int i) {max=i; time = bclock::local_time();};
     void update();
 };
 

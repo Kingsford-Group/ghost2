@@ -37,10 +37,13 @@ struct move{
       for(auto it = neighborsu->begin(); it != neighborsu->end(); it++){
         auto mapped = f->left.find(*it);
         if(mapped != f->left.end()){
+          string s = mapped->second;
           //There is a matching edge to w that we are losing
-          if(neighborsw->find(mapped->second) != neighborsw->end()) s0--;
+          if(neighborsw->find(s) != neighborsw->end()) s0--;
+          if(s == v) s = w;
+          else if(s == w) s = v;
           //There is a matching edge to v that we are adding
-          if(neighborsv->find(mapped->second) != neighborsv->end()) s0++;
+          if(neighborsv->find(s) != neighborsv->end()) s0++;
         }
       }
       if(neighborsup){
@@ -48,17 +51,16 @@ struct move{
         for(auto it = neighborsup->begin(); it != neighborsup->end(); it++){
           auto mapped = f->left.find(*it);
           if(mapped != f->left.end()){
-            //There is a matching edge to w that we are adding
-            if(neighborsw->find(mapped->second) != neighborsw->end()) s0++;
+            string s = mapped->second;
             //There is a matching edge to v that we are losing
-            if(neighborsv->find(mapped->second) != neighborsv->end()) s0--;
+            if(neighborsv->find(s) != neighborsv->end()) s0--;
+            if(s == v) s = w;
+            else if(s == w) s = v;
+            //There is a matching edge to w that we are adding
+            if(neighborsw->find(s) != neighborsw->end()) s0++;
           }
         }
       }
-      //Handle the under-counting when u--up and w--v are edges
-      if(neighborsw->find(v) != neighborsw->end() && neighborsu->find(up) != neighborsu->end()) s0 += 2;
-      //Handle self-loops on u and v
-      if(neighborsu->find(u) != neighborsu->end() && neighborsv->find(v) != neighborsv->end()) s0++;
     }
 
     if(dists){

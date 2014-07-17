@@ -16,6 +16,21 @@ typedef boost::bimaps::unordered_set_of<string> uset;
 typedef boost::bimaps::bimap<uset, uset> bmap;
 typedef boost::unordered_map<pair<string,string>, D_alpha> distmap;
 
+void adjustWeights(Graph &g1, Graph &g2, bmap *align, vector<D_alpha> *matches){
+  for(int i = 0; i < matches->size(); i++){
+    int count = 0;
+    vlist *adj1 = g1.neighbors2((*matches)[i].get_n1());
+    vlist *adj2 = g2.neighbors2((*matches)[i].get_n2());
+    for(auto it = adj1->begin(); it != adj1->end(); it++){
+      auto mapped = align->left.find(*it);
+      if(mapped != align->left.end() && adj2->find(mapped->second) != adj2->end()) count++;
+    }
+    D_alpha d = (*matches)[i];
+    d.set_da(d.get_da() / (count/2.0 + 1));
+    (*matches)[i] = d;
+  }
+}
+
 //If the vertices in best are not already part of a closer alignment, align them
 void insertIfBetter(bmap* alignment, D_alpha best, distmap& dalphas)
 { 
@@ -35,13 +50,13 @@ void insertIfBetter(bmap* alignment, D_alpha best, distmap& dalphas)
 
 //Returns a vector of the D_alphas for the k nearest n2 nodes for each n1 node,
 //leaving out any that are already aligned
-vector<D_alpha> computePairwiseScores(boost::unordered_set<string>& n1, boost::unordered_set<string>& n2, bmap& alignment, distmap& dalphas, int k)
+vector<D_alpha> computePairwiseScores(vlist *n1, vlist *n2, bmap& alignment, distmap& dalphas, int k)
 {
   vector<D_alpha> ans;
-  for(auto it1 = n1.begin(); it1 != n1.end(); ++it1){
+  for(auto it1 = n1->begin(); it1 != n1->end(); ++it1){
     if(alignment.left.find(*it1) != alignment.left.end()) continue; //Skip if already aligned
     vector<D_alpha> maxheap;
-    for(auto it2 = n2.begin(); it2 != n2.end(); ++it2){
+    for(auto it2 = n2->begin(); it2 != n2->end(); ++it2){
       if(alignment.right.find(*it2) != alignment.right.end()) continue; //Skip if already aligned
 
       D_alpha d = dalphas.at(make_pair(*it1,*it2));
@@ -139,12 +154,15 @@ void extendAlignment(D_alpha seed, Graph& g1, Graph& g2, bmap *alignment, vector
     maxP.pop_back();
     insertIfBetter(alignment, best, d);
     
-    auto neighbors1 = g1.neighbors(best.get_n1());
-    auto neighbors2 = g2.neighbors(best.get_n2());
+    vlist *neighbors1 = g1.neighbors2(best.get_n1());
+    vlist *neighbors2 = g2.neighbors2(best.get_n2());
 
     vector<D_alpha> matches = computePairwiseScores(neighbors1, neighbors2, *alignment, d, k);
     //cout << matches.size() << " potential matches for " << neighbors1.size() << " x " << neighbors2.size() << " neighbors\n";
     if(matches.size() == 0) continue;
+
+    //adjustWeights(g1, g2, alignment, &matches);
+
     //Do the alignment problem
     matches = performMatching(matches);
     //Filter out matches that are already aligned or have D_seq>beta

@@ -11,6 +11,7 @@ class D_alpha
     string get_n2() {return n2;};
     double get_da() {return d;};
     double get_ds() {return s;};
+    void set_da(double da) {d = da;}
     void update_da(double a) {d = a*d + (1.0-a)*s;};
     void set_seq(double m) {s=m;};
 };

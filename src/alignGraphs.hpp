@@ -6,6 +6,8 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <iostream>
 #include <fstream>
+#include <stdlib.h>
+#include <time.h>
 #include "graph.hpp"
 #include "alignmentExtender.hpp"
 
@@ -25,25 +27,49 @@ distmap getDistMap(vector<D_alpha>& v)
   return m;
 }
 
+pair<D_alpha, vector<D_alpha>> getNextSeed(double skipProb, vector<D_alpha> *minP)
+{
+  vector<D_alpha> skipped;
+  D_alpha d = minP->front();
+  while(1){
+    pop_heap (minP->begin(), minP->end(),CompareD_alphaG());
+    minP->pop_back();
+    if(rand() > ((1.0-skipProb)*RAND_MAX) && minP->size() > 0){
+      skipped.push_back(d);
+      d = minP->front();
+    }else break;
+  }
+  return std::make_pair(d, skipped);
+}
+
 /* initialize bmap f
  * while minP not empty, 
  *  pop D_alpha d
  *  if no part of d in f, GreedyQAPEXtend(G,H,d,f) */
-bmap seedAndExtend(Graph& G, Graph& H, vector<D_alpha>& minP, int k)
+bmap seedAndExtend(Graph& G, Graph& H, vector<D_alpha>& minP, int k, double skipProb)
 {
+  srand(time(0));
   vector<D_alpha> allDists(minP);
   distmap dmap = getDistMap(allDists);
   bmap f;
   while(minP.size()>0)
   {
-    D_alpha d = minP.front();
-    pop_heap (minP.begin(), minP.end(),CompareD_alphaG());
-    minP.pop_back();
+    auto next = getNextSeed(skipProb, &minP);
+    D_alpha d = next.first;
+
+    //D_alpha d = minP.front();
+    //pop_heap (minP.begin(), minP.end(),CompareD_alphaG());
+    //minP.pop_back();
 
     string n1 = d.get_n1();
     string n2 = d.get_n2();
     if(f.left.find(n1) == f.left.end() && f.right.find(n2) == f.right.end())
       extendAlignment(d, G, H, &f, allDists, dmap, k);
+
+    for(int i = 0; i < next.second.size(); i++){
+      minP.push_back(next.second[i]);
+      push_heap(minP.begin(), minP.end(), CompareD_alphaG());
+    }
   }
   return f;
 }
@@ -67,16 +93,16 @@ void printICS(Graph& G, Graph& H, bmap& result)
   int edgesH = 0;
   for(auto it = result.left.begin(); it != result.left.end(); it++)
   {
-    auto adj1 = G.neighbors(it->first);
-    auto adj2 = H.neighbors(it->second);
-    for(auto it2 = adj1.begin(); it2 != adj1.end(); it2++){
+    vlist *adj1 = G.neighbors2(it->first);
+    vlist *adj2 = H.neighbors2(it->second);
+    for(auto it2 = adj1->begin(); it2 != adj1->end(); it2++){
       auto f_a = result.left.find(*it2);
-      if(f_a != result.left.end() && adj2.find(f_a->second) != adj2.end()){
+      if(f_a != result.left.end() && adj2->find(f_a->second) != adj2->end()){
         matchingEdges++;
         if(*it2 == it->first) matchingEdges++; //Double count self loops
       }
     }
-    for(auto it2 = adj2.begin(); it2 != adj2.end(); it2++) 
+    for(auto it2 = adj2->begin(); it2 != adj2->end(); it2++) 
       if(result.right.find(*it2) != result.right.end()){
         edgesH++;
         if(*it2 == it->second) edgesH++; //Double count self loops
@@ -85,9 +111,9 @@ void printICS(Graph& G, Graph& H, bmap& result)
   vector<string> nodesG = G.nodes();
   int edgesG = 0;
   for(auto it = nodesG.begin(); it != nodesG.end(); it++){
-    auto n = G.neighbors(*it);
-    edgesG += n.size();
-    if(n.find(*it) != n.end()) edgesG++; //Double count self loops
+    vlist *n = G.neighbors2(*it);
+    edgesG += n->size();
+    if(n->find(*it) != n->end()) edgesG++; //Double count self loops
   }
 
   double ec = ((double)matchingEdges / edgesG) * 100.0;
@@ -96,7 +122,7 @@ void printICS(Graph& G, Graph& H, bmap& result)
   cout << "ICS = " << ics << "\%\n";
 }
 
-bmap alignGraphs(Graph& G, Graph& H, vector<D_alpha>& distances, int k)
+bmap alignGraphs(Graph& G, Graph& H, vector<D_alpha>& distances, int k, double skipProb)
 {
   cout << "aligning graphs...\n";
   vector<D_alpha> minP;  // empty vector is a heap
@@ -107,7 +133,7 @@ bmap alignGraphs(Graph& G, Graph& H, vector<D_alpha>& distances, int k)
   }
 
   ptime t = bclock::local_time();
-  bmap result = seedAndExtend(G, H, minP, k);
+  bmap result = seedAndExtend(G, H, minP, k, skipProb);
   cout << "aligned " << result.size() << " nodes in " << (bclock::local_time()-t).total_milliseconds() << " milliseconds\n";
 
   printICS(G, H, result);

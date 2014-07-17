@@ -10,6 +10,7 @@
 #include "spectralToDistance.hpp"
 #include "alignGraphs.hpp"
 #include "localImprove.hpp"
+//#include "localImprove2.hpp"
 
 using std::string;
 using std::cout;
@@ -83,10 +84,18 @@ void computeAlignment(ConfigData c)
       else
         *evals = getBlastMap(c.SeqScores);
       localImprove(G, H, evals, &align, c.searchiter, c.ratio, c.numProcessors);
+      //localImprove2(G, H, &align, c.searchiter, c.numProcessors);
       printICS(G, H, align);
     }
     return;
   }
+
+/*bmap f2 = alignQ(G, H);
+  printICS(G, H, f2);
+  localImprove(G, H, NULL, &f2, c.searchiter, c.ratio, c.numProcessors);
+  if(c.searchiter != 0)printICS(G, H, f2);
+  printMap(f2, G.getName(), H.getName());
+  return;*/
 
   vector<D_alpha> dist;
 
@@ -160,7 +169,7 @@ void computeAlignment(ConfigData c)
   printICS(G, H, align);*/
 
   // align graphs
-  bmap f = alignGraphs(G, H, dist, c.nneighbors);
+  bmap f = alignGraphs(G, H, dist, c.nneighbors, c.seedSkip);
   localImprove(G, H, evals, &f, c.searchiter, c.ratio, c.numProcessors);
   printICS(G, H, f);
   delete evals;

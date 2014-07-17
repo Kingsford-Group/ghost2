@@ -15,7 +15,8 @@ struct ConfigData
       searchiter = 10; // not sure
   double alpha=-1.0,
          beta=1.0,
-         ratio=8.0; // not sure
+         ratio=8.0, // not sure
+         seedSkip=0;
   bool dumpSignatures=false,
        dumpDistances=false,
        directed=false;
@@ -31,9 +32,9 @@ void ConfigData::use(string s)
                   "sequencescores: ", "nneighbors: ", "searchiter: ",
                   "hops: ", "processors: ", "alpha: ", "beta: ", "ratio: ", 
                   "dumpSignatures: ", "dumpDistances: ", "directed: ",
-                  "alignFile: ", "distFile: "};
+                  "alignFile: ", "distFile: ", "seedSkip: "};
   bool used=false;
-  for(int i=0;i<17;i++)
+  for(int i=0;i<18;i++)
     if(s.size() > pos[i].size() && s.substr(0,pos[i].size()) == pos[i])
     {
       s = s.substr(pos[i].size());
@@ -58,6 +59,7 @@ void ConfigData::use(string s)
         case 14: if(s=="true") directed=true; break;
         case 15: AlignFile = s; break;
         case 16: DistFile = s; break;
+        case 17: seedSkip = atof(s.c_str()); break;
         default: break;
       }
     }
