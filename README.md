@@ -6,28 +6,51 @@ GHOST is a program that aligns two networks using an algorithm detailed in "Glob
 Building
 ========
 
-To use this code, first download it from the git repository (https://github.com/davidlindenbaum/GHOST-CPP). You will need to download and install the C++ Boost library if you do not currently have it installed from (www.boost.org/users/download). If Boost is not installed, please read the Installing Boost section before proceeding. In addition, make sure that your g++ is recent enough that is supports c++11. The version GHOST was built with was 4.8.2, but you can check by running g++ -dumpversion in a terminal and googling.
+To use this code, first download it from the [git
+repository](https://github.com/Kingsford-Group/ghost2). You will need to
+download and install the C++ [Boost library](www.boost.org/users/download) if
+you do not currently have it installed from. If Boost is not installed, please
+read the Installing Boost section before proceeding. In addition, make sure
+that your g++ is recent enough that is supports c++11. The version GHOST was
+built with was 4.8.2, but you can check by running g++ -dumpversion in a
+terminal and googling.
 
-Now, using a terminal navigate to the directory that you unzipped from and execute the following commands:
+Now, using a terminal navigate to the directory that you unzipped from and
+execute the following commands:
 
+```
   $ cd GHOST-CPP
   $ export BOOSTLIB=<PATH_TO_BOOSTLIB>
   $ export BOOSTDIR=<PATH_TO_BOOSTDIR>
   $ make
+```
 
-where <PATH_TO_BOOSTLIB> and <PATH_TO_BOOSTDIR> are the absolute paths to the lib folder containing the boost libaries (ex. libboost_thread.a) and the include folder containing the boost folder with all of the .hpp files. If it errors, it is possible that your ld library path is not set to the right place. Trying something like:
+where `<PATH_TO_BOOSTLIB>` and `<PATH_TO_BOOSTDIR>` are the absolute paths to
+the lib folder containing the boost libaries (ex. libboost_thread.a) and the
+include folder containing the boost folder with all of the .hpp files. If it
+errors, it is possible that your ld library path is not set to the right place.
+Trying something like:
 
+```
   $ export LD_LIBRARY_PATH=/opt/local/lib:$LD_LIBRARY_PATH
+```
 
-may help. If all has went well, you should see an executable file named GHOST in the directory now.
+may help. If all has went well, you should see an executable file named GHOST
+in the directory now.
 
 Installing Boost
 ================
 
-The following instructions have been tested on a fresh installation of Ubuntu 14.04 LTS.
+The following instructions have been tested on a fresh installation of Ubuntu
+14.04 LTS.
 
-First download Boost from (www.boost.org/user/download) and zlib from (www.zlib.net). zlib is necessary to build one of the parts of boost properly. Unzip both into your home directory. Now, open a terminal and execute the following commands:
+First download Boost from
+[www.boost.org/user/download](www.boost.org/user/download) and zlib from
+[www.zlob.net](www.zlib.net). zlib is necessary to build one of the parts of
+boost properly. Unzip both into your home directory. Now, open a terminal and
+execute the following commands:
 
+```
   $ sudo apt-get install vim g++ bzip2 python-dev libxml2-dev libbz2-dev
   $ cd zlib-1.2.8
   $ ./configure; make test
@@ -35,8 +58,10 @@ First download Boost from (www.boost.org/user/download) and zlib from (www.zlib.
   $ cd ../boost_1_55_0
   $ ./boostrap.sh
   $ sudo ./b2 install
+```
 
-If all went well, Boost will be installed. It is likely that you will be able run make now.
+If all went well, Boost will be installed. It is likely that you will be able
+run make now.
 
 File Formats
 ============
@@ -44,16 +69,24 @@ File Formats
 Configuration Format
 --------------------
 
-The configuration file tells the program what you want it to do. It will look something like:
+The configuration file tells the program what you want it to do. It will look
+something like:
 
+```
   [main]
   network1: Data/CJejuni/cjejuni.gexf
   network2: Data/EColi/ecoli.gexf
   sequencescores: Data/CJejuni_vs_EColi.evalues
   hops: 5
+```
 
-The configuration file must have [main] as its first line and must include values for network1 and network2. In addition, there should be no spaces preceding or following the text in each line. You can set each option by putting that option on a line followed by a ':' character, a space, and the appropriate value. The options that can be set are as follows:
+The configuration file must have [main] as its first line and must include
+values for network1 and network2. In addition, there should be no spaces
+preceding or following the text in each line. You can set each option by
+putting that option on a line followed by a ':' character, a space, and the
+appropriate value. The options that can be set are as follows:
 
+```
   NAME - DESCRIPTION
   network1 - The .gexf or .net file describing the first network that is to 
              be aligned.
@@ -91,44 +124,66 @@ The configuration file must have [main] as its first line and must include value
                   computation to stop after computing the distances. Note that 
                   the boolean values are lower case. The default value is false.
 
-The extension associated with this format is ".cfg".
+```
+
+The extension associated with this format is `.cfg`.
 
 Graph File Format (gexf)
 ------------------------
 
-GHOST can use the GEXF format which can be found at (http://gexf.net/format). The graph should have the attribute title="gname" and the ids and values of each node should be unique. The extension associated with this format is ".gexf".
+GHOST can use the GEXF format which can be found at
+[http://gexf.net/format](http://gexf.net/format). The graph should have the
+attribute title="gname" and the ids and values of each node should be unique.
+The extension associated with this format is `.gexf`.
 
 Graph File Format (net)
 -----------------------
 
-GHOST can also use the .net format which is composed of |E| lines of the form:
+GHOST can also use the `.net` format which is composed of |E| lines of the
+form:
 
+```
   v1 v2
+```
 
-where v1 and v2 are verticies in the graph. The extension associated with this format is ".net".
+where v1 and v2 are verticies in the graph. The extension associated with this
+format is `.net`.
 
 Alignment File Format
 ---------------------
 
-For input graphs G and H, the alignment format that GHOST outputs has lines of the form:
+For input graphs G and H, the alignment format that GHOST outputs has lines of
+the form:
 
+```
   a   b
+```
 
-where a is the name of a unique vertex from G, b is the name of a unique vertex from H, and the number of lines is min(|G|, |H|). The extension associated with this format is ".af".
+where a is the name of a unique vertex from G, b is the name of a unique vertex
+from H, and the number of lines is min(|G|, |H|). The extension associated with
+this format is `.af`.
 
 Spectral Distance Format
 ------------------------
 
-For input graphs G and H, the spectral distance format that GHOST outputs has lines of the form:
+For input graphs G and H, the spectral distance format that GHOST outputs has
+lines of the form:
 
+```
   a   b   d
+```
 
-where a is the name of a vertex from G, b is the name of a vertex from H, and d is the spectral distance between them. There should be |G|*|H| lines. The extension associated with this format is ".sdf".
+where a is the name of a vertex from G, b is the name of a vertex from H, and d
+is the spectral distance between them. There should be |G|*|H| lines. The
+extension associated with this format is `.sdf`.
 
 Signature Format
 ----------------
 
-The signature format is not human readable. It is stored in a compressed format and can be outputted for the sake of precomputation by setting dumpSignatures to true in the configuration file. The extension associated with this format is ".sig.gz".
+The signature format is not human readable. It is stored in a compressed format
+and can be outputted for the sake of precomputation by setting dumpSignatures
+to true in the configuration file. The extension associated with this format is
+`.sig.gz`.
 
 Usage
 =====
@@ -137,22 +192,25 @@ First, make a config file in the folder (see file formats).
 
 GHOST has the following options:
 
+```
   -c    This option accepts the path to the configuration file as an argument. It should almost always be present when you run the program.
   -p    This option accepts the number of processors it should use as an argument. It is recommended that this is not set because the program automatically generates what should be the optimal number of processors. This can be set in the .cfg file.
   -k    This option accepts the radius from the each node the spectral signature should be computed. The default value is 4. This can be set in the .cfg file.
+```
 
 A example of an ordinary run is:
 
+```
   $ ./GHOST -c cjejuni_vs_ecoli.cfg
+```
 
 Libraries Used
 ==============
 
 The GHOST program uses the following free-to-use libraries and files:
 
-  1. Boost (www.boost.org)
-  2. Eigen (eigen.tuxfamily.org)
-  3. threadpool (threadpool.sourceforge.net)
-  4. fastapprox (https://code.google.com/p/fastapprox)
-
+  1. Boost [www.boost.org](www.boost.org)
+  2. Eigen [eigen.tuxfamily.org](eigen.tuxfamily.org)
+  3. threadpool [threadpool.sourceforge.net](threadpool.sourceforge.net)
+  4. fastapprox [https://code.google.com/p/fastapprox](https://code.google.com/p/fastapprox)
 
