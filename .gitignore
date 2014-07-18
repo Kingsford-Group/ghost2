@@ -1,0 +1,12 @@
+*.exe
+*.out
+*.stackdump
+*.gz
+*.gexf
+*.swp
+*.swo
+*.dist
+*.af
+*.sdf
+Configs/
+Data/
