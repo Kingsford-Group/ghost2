@@ -63,6 +63,21 @@ double DTopo(LevelInfo *v1, LevelInfo *v2, int s)
     dist += jsDist(&(v1[i].signature)[0], &(v2[i].signature)[0], 
         min(v1[i].signature.size(), v2[i].signature.size()));
   return dist/s;
+
+  /*
+  // alternate implementation, return min not avg
+  double dist = 1e10;
+  for(int i=0;i<s;i++)
+    dist = min(dist,
+               jsDist(&(v1[i].signature)[0], &(v2[i].signature)[0],
+                      min(v1[i].signature.size(), v2[i].signature.size())));
+  return dist;
+  */
+  
+  /*
+  return jsDist(&(v1[s-1].signature)[0], &(v2[s-1].signature)[0],
+                min(v1[s-1].signature.size(), v2[s-1].signature.size()));
+  */
 }
 
 //Calculates the D_alphas from node n to all nodes in m2

@@ -64,6 +64,26 @@ void AdjacencyMatrix::extend(Graph *input, string source)
       }
   }
   prev = next;
+
+  /*
+  // only do the ring... bad idea
+  nvert = prev.size();
+  m.resize(nvert,nvert);
+  for(int i=0;i<nvert;i++)
+    for(int j=0;j<nvert;j++)
+    {
+      if(i==j) m(i,j)=1;
+      else
+      {
+        if((*(neighborhoods[prev[i]])).find(prev[j]) !=
+           (*(neighborhoods[prev[i]])).end())
+           m(i,j) = -1. / sqrt(dmap[prev[i]] * dmap[prev[j]]);
+        else
+          m(i,j)=0;
+      }
+    }
+  */
+
   nvert = nodes.size();
   m.resize(nvert,nvert);
 
@@ -111,7 +131,7 @@ vector<double> AdjacencyMatrix::rayleighEigen()
 {
   vector<double> result;
   return result;
-  int tries = 30;
+  int tries = 2*m.rows();
   for(int i=0;i<tries;i++)
   {
     double d = rayleigh(&m);
@@ -128,7 +148,7 @@ vector<double> AdjacencyMatrix::rayleighEigen()
 vector<double> AdjacencyMatrix::inverseEigen()
 {
   vector<double> result;
-  int tries = 10;
+  int tries = 2;
   double mu = 1.0/(tries+1);
   for(int i=1;i<=tries;i++)
   {

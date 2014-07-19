@@ -8,6 +8,7 @@
 #include "computeSpectralSignatures.hpp"
 #include "blastDistance.hpp"
 #include "spectralToDistance.hpp"
+#include "writeAlternateDistances.hpp"
 #include "alignGraphs.hpp"
 #include "localImprove.hpp"
 //#include "localImprove2.hpp"
@@ -97,13 +98,19 @@ void computeAlignment(ConfigData c)
   printMap(f2, G.getName(), H.getName());
   return;*/
 
+  if(c.alternateDistances)
+  {
+    writeAlternateDistances(&G, &H);
+    c.DistFile=G.getName()+"_vs_"+H.getName()+".df";
+  }
+
   vector<D_alpha> dist;
 
   if(c.DistFile == ""){
   // compute spectral signatures
   if(c.Gsigs == "")
   {
-    computeSpectralSignatures(&G, c.hops, c.numProcessors);
+    computeSpectralSignatures(&G, c.hops, c.numProcessors, c.SigApprox);
     c.Gsigs = (G.getName() + ".sig.gz");
   }
   else
@@ -120,7 +127,7 @@ void computeAlignment(ConfigData c)
   }
   if(c.Hsigs == "")
   {
-    computeSpectralSignatures(&H, c.hops, c.numProcessors);
+    computeSpectralSignatures(&H, c.hops, c.numProcessors, c.SigApprox);
     c.Hsigs = (H.getName() + ".sig.gz");
   }
   else 
