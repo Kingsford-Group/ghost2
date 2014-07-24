@@ -29,17 +29,19 @@ Graph readFromNet(string fileName, bool directed)
   string name = fileName.substr(start+1,end-start-1);
   result.setName(name);
 
-  vlist V;
-  while(1)
+  int N,E;
+  fin >> N >> E;
+  for(int i=0;i<N;i++)
+  {
+    string n;
+    fin >> n;
+    result.addVertex(n);
+  }
+  for(int i=0;i<E;i++)
   {
     string n1,n2;
     fin >> n1 >> n2;
-    if(fin.eof()) break;
-    if(V.find(n1) == V.end())
-      {result.addVertex(n1); V.insert(n1);}
-    if(V.find(n2) == V.end())
-      {result.addVertex(n2); V.insert(n2);}
-    result.addEdge(n1,n2);
+    result.addEdge(n1, n2);
   }
   fin.close();
   cout << "extracted: " << result.getName() << ".net in " <<

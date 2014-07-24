@@ -127,11 +127,19 @@ GHOST can use the GEXF format which can be found at (http://gexf.net/format). Th
 Graph File Format (net)
 -----------------------
 
-GHOST can also use the .net format which is composed of |E| lines of the form:
+GHOST can also use the .net format which is composed of |1+V+E| where the first line has the number of verticies and edges:
 
-  v1 v2
+  |V| |E|
 
-where v1 and v2 are verticies in the graph. The extension associated with this format is ".net".
+The next |V| lines are of the form:
+
+  a
+
+where v is the name of the next vertex, and the last |E| lines are of the form:
+
+  a b
+
+where a and b are verticies in the graph. The extension associated with this format is ".net".
 
 Alignment File Format
 ---------------------
