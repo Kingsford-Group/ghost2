@@ -34,7 +34,6 @@ double inverseIter(MatrixXd *A, double mu)
   for(int i=0;i<N;i++)
     (*A)(i,i) -= mu;
   LDLT<MatrixXd,Lower> ALU = (*A).ldlt();
-//  FullPivLU<MatrixXd> ALU = (*A).fullPivLu();
   for(int i=0;i<1000;i++)
   {
     VectorXd temp = seed;
@@ -42,7 +41,6 @@ double inverseIter(MatrixXd *A, double mu)
     cur = normalize(&seed); // in place
     if(fabs(cur-prev) < ZERO) 
     {
-//      cout << "iters: " << i << "\n";
       for(int i=0;i<N;i++)
         if(fabs(temp(i)) > ZERO)
         {
@@ -56,7 +54,7 @@ double inverseIter(MatrixXd *A, double mu)
   }
   for(int i=0;i<N;i++)
     (*A)(i,i) += mu;
-//  if(!flag) cout << "warning: did not converge\n";
+//  if(!flag) cout << "warning: did not converge\n"; // uncomment for warning
   cur = 1.0/cur + mu;
   return cur;
 }
@@ -74,14 +72,13 @@ double rayleigh(MatrixXd *A)
     for(int i=0;i<N;i++)
       (*A)(i,i) -= cur;
     seed = (*A).ldlt().solve(seed);
-//    seed = (*A).fullPivLu().solve(seed);
     seed.normalize();
     for(int i=0;i<N;i++)
       (*A)(i,i) += cur;
     if(fabs(cur-prev) < ZERO) {flag=true; break;}
     prev=cur;
   }
-  if(!flag) cout << "warning: did not converge\n";
+//  if(!flag) cout << "warning: did not converge\n"; // uncomment for warning
   return cur;
 }
 

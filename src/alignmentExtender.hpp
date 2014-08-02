@@ -148,8 +148,6 @@ void extendAlignment(D_alpha seed, Graph& g1, Graph& g2, bmap *alignment, vector
 
   while(!maxP.empty()){
     D_alpha best = maxP.front();
-    //cout << "Extending from seed [" << best.get_n1() << ", " << best.get_n2() << "]\n";
-    //cout << "Queue contains " << maxP.size() << " matches\n";
     pop_heap(maxP.begin(), maxP.end(), CompareD_alphaL());
     maxP.pop_back();
     insertIfBetter(alignment, best, d);
@@ -158,22 +156,17 @@ void extendAlignment(D_alpha seed, Graph& g1, Graph& g2, bmap *alignment, vector
     vlist *neighbors2 = g2.neighbors2(best.get_n2());
 
     vector<D_alpha> matches = computePairwiseScores(neighbors1, neighbors2, *alignment, d, k);
-    //cout << matches.size() << " potential matches for " << neighbors1.size() << " x " << neighbors2.size() << " neighbors\n";
     if(matches.size() == 0) continue;
-
-    //adjustWeights(g1, g2, alignment, &matches);
 
     //Do the alignment problem
     matches = performMatching(matches);
     //Filter out matches that are already aligned or have D_seq>beta
     auto end = remove_if(matches.begin(), matches.end(), checkSeq);
-    //cout << "aligned " << matches.size() << " nodes\n";
 
     for(auto it = matches.begin(); it != end; ++it){
       alignment->insert(bmap::value_type(it->get_n1(), it->get_n2()));
       maxP.push_back(*it);
       push_heap(maxP.begin(), maxP.end(), CompareD_alphaL());
     }
-    //cout << "alignment now contains " << alignment->size() << " matches\n\n";
   }
 }

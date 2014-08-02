@@ -12,6 +12,7 @@ using std::cout;
 typedef boost::posix_time::microsec_clock bclock;
 typedef boost::posix_time::ptime ptime;
 
+// read from simpler file format
 Graph readFromNet(string fileName, bool directed)
 { 
   ptime t = bclock::local_time();

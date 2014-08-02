@@ -6,6 +6,8 @@
 #include "Eigen/Dense"
 using std::cout;
 using std::ofstream;
+
+// should converge for all inputs
 void writeAlternateDistances(Graph *G, Graph *H)
 {
   ofstream fout((*G).getName()+"_vs_"+(*H).getName()+".df");
@@ -17,8 +19,6 @@ void writeAlternateDistances(Graph *G, Graph *H)
            S(*t.size(), *s.size()),
            P(*t.size(), *s.size());
   S.fill(1); P.fill(1);
-//  cout << "A:\n" << *A << "\n" << "B:\n" << *B << "\n";
-//  cout << "orig:\n" << S << "\n";
   bool flag=false;
   for(int i=0;i<100;i++)
   {
@@ -42,7 +42,6 @@ void writeAlternateDistances(Graph *G, Graph *H)
           {cout << i << " iterations\n";flag=true; break;}
       }
       cout << "iter: " << i << "\n";
-//      cout << "iter " << i << ":\n" << S << "\n";
   }
   for(int r=0;r<S.rows();r++)
     for(int c=0;c<S.cols();c++)

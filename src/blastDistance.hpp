@@ -12,6 +12,7 @@ using std::ifstream;
 
 typedef boost::unordered_map<pair<string,string>, double> blastMap;
 
+// reads in from .evalues file
 blastMap getBlastMap(string filename)
 {
   blastMap bevals;

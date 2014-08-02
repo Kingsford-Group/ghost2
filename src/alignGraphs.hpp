@@ -57,10 +57,6 @@ bmap seedAndExtend(Graph& G, Graph& H, vector<D_alpha>& minP, int k, double skip
     auto next = getNextSeed(skipProb, &minP);
     D_alpha d = next.first;
 
-    //D_alpha d = minP.front();
-    //pop_heap (minP.begin(), minP.end(),CompareD_alphaG());
-    //minP.pop_back();
-
     string n1 = d.get_n1();
     string n2 = d.get_n2();
     if(f.left.find(n1) == f.left.end() && f.right.find(n2) == f.right.end())

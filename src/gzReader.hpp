@@ -121,9 +121,7 @@ spectramap loadSigs(string file)
   in.push(io::file_descriptor_source(file));
 
   int numVerts = readInt(in);
-//  cout << "numVerts: " << numVerts << "\n";
   int numHops = readInt(in);
-//  cout << "numHops: " << numHops << "\n";
 
   spectramap map;
 
@@ -131,32 +129,24 @@ spectramap loadSigs(string file)
   {
     vector<LevelInfo> levels;
     string vname = readString(in);
-//    cout << "\tvname: " << vname << "\n";
     for(int j=0; j < numHops; j++)
     {
       int l = readInt(in);
-//      cout << "\t\tlevel: " << l << "\n";
       int numnames = readInt(in);
-//      cout << "\t\tnumNames: " << numnames << "\n";
       vector<string> vnames;
       vector<double> spectrum;
      
       for(int k=0; k < numnames; k++)
-      {
         vnames.push_back(readString(in));
-//        cout << "\t\t\tk=" << k << ": " << vnames[k] << "\n";
-      }
 
       int spectrumSize = readInt(in);
-//      cout << "\t\tspectrumSize: " << spectrumSize << "\n";
 
-      for(int k=0; k < spectrumSize; k++){
+      for(int k=0; k < spectrumSize; k++)
         spectrum.push_back(readDouble(in));
-//        cout << "\t\t\tk= " << k << ": " << spectrum[k] << "\n";
-      }
+
       double density = readDouble(in);
-//      cout << "\t\tdensity: " << density << "\n";
-      LevelInfo m(vnames,spectrum,density,ipsenMikhailovVector(&spectrum[0], spectrum.size(), .005));
+      LevelInfo m(vnames,spectrum,density,
+                  ipsenMikhailovVector(&spectrum[0], spectrum.size(), .005));
       levels.push_back(m);
     }
     map[vname] = levels;

@@ -17,6 +17,8 @@ using boost::threadpool::pool;
 typedef boost::posix_time::microsec_clock bclock;
 typedef boost::posix_time::ptime ptime;
 
+// all three functions compute the spectrum to use
+// first is exact, other two are approximations
 void spectrum(Graph *input, int numHops, string source, 
               vector<LevelData> *output, ProgressBar *p)
 {
@@ -55,6 +57,8 @@ void spectrumI(Graph *input, int numHops, string source,
   (*p).update();
 }
 
+// uses graph to generate spectrums of induced subgraphs
+// of a radius 1-#hops from every possible source node
 void computeSpectralSignatures(Graph *input, int numHops, int numP, string mode)
 {
   ptime t = bclock::local_time();

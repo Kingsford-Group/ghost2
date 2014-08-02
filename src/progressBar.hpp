@@ -5,6 +5,7 @@
 typedef boost::posix_time::microsec_clock bclock;
 typedef boost::posix_time::ptime ptime;
 
+// may drop counts in parallel
 class ProgressBar
 {
   int prev=0, count=0, max;

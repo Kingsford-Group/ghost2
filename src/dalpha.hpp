@@ -1,5 +1,7 @@
 #include <string>
 using std::string;
+
+// stores two nodes and two distances
 class D_alpha
 {
   string n1,n2;
