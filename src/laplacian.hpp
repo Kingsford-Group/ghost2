@@ -65,25 +65,6 @@ void AdjacencyMatrix::extend(Graph *input, string source)
   }
   prev = next;
 
-  /*
-  // only do the ring... bad idea
-  nvert = prev.size();
-  m.resize(nvert,nvert);
-  for(int i=0;i<nvert;i++)
-    for(int j=0;j<nvert;j++)
-    {
-      if(i==j) m(i,j)=1;
-      else
-      {
-        if((*(neighborhoods[prev[i]])).find(prev[j]) !=
-           (*(neighborhoods[prev[i]])).end())
-           m(i,j) = -1. / sqrt(dmap[prev[i]] * dmap[prev[j]]);
-        else
-          m(i,j)=0;
-      }
-    }
-  */
-
   nvert = nodes.size();
   m.resize(nvert,nvert);
 
@@ -121,7 +102,6 @@ vector<double> AdjacencyMatrix::getEigen()
     return v;
   SelfAdjointEigenSolver<MatrixXd> es(m, EigenvaluesOnly);
   VectorXd evals = es.eigenvalues();
-//  VectorXd evals = m.selfadjointView<Eigen::Upper>().eigenvalues();
   for(int i=0; i<evals.rows(); i++)
     v.push_back(evals(i));
   return v;
@@ -130,8 +110,9 @@ vector<double> AdjacencyMatrix::getEigen()
 vector<double> AdjacencyMatrix::rayleighEigen()
 {
   vector<double> result;
-  int tries = 2*m.rows();
-  if(tries<10) tries=10;
+//  int tries = m.rows()/2;
+//  if(tries<1) tries=1;
+  int tries = 10;
   for(int i=0;i<tries;i++)
   {
     double d = rayleigh(&m);

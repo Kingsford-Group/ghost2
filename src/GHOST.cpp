@@ -77,8 +77,8 @@ void computeAlignment(ConfigData c)
         *evals = getBlastMap(c.SeqScores);
       localImprove(G, H, evals, &align, c.searchiter, c.ratio, c.numProcessors);
       printICS(G, H, align);
-    }i
-    delete evals;
+      delete evals;
+    }
     return;
   }
 
