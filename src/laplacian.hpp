@@ -130,8 +130,8 @@ vector<double> AdjacencyMatrix::getEigen()
 vector<double> AdjacencyMatrix::rayleighEigen()
 {
   vector<double> result;
-  return result;
   int tries = 2*m.rows();
+  if(tries<10) tries=10;
   for(int i=0;i<tries;i++)
   {
     double d = rayleigh(&m);
@@ -141,6 +141,7 @@ vector<double> AdjacencyMatrix::rayleighEigen()
         found=true;
     if(!found) result.push_back(d);
   }
+  if(result.size()==0) cout << "whut?\n";
   return result;
 }
 

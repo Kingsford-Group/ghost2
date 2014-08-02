@@ -90,6 +90,7 @@ void applyAlpha(double a, double b, vector<D_alpha> *scores, blastmap* blastscor
   if(!blastscores) return;
 
   if(a == -1){
+    cout << "whut z?\n";
     vector<double> maxheap;
     for(auto it = scores->begin(); it != scores->end(); it++){
       if(it->get_da() != 0) maxheap.push_back(it->get_da());
