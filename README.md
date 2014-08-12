@@ -77,31 +77,35 @@ something like:
   network1: Data/CJejuni/cjejuni.gexf
   network2: Data/EColi/ecoli.gexf
   sequencescores: Data/CJejuni_vs_EColi.evalues
-  hops: 5
+  hops: 4
 ```
 
 The configuration file must have [main] as its first line and must include
 values for network1 and network2. In addition, there should be no spaces
 preceding or following the text in each line. You can set each option by
 putting that option on a line followed by a ':' character, a space, and the
-appropriate value. The options that can be set are as follows:
+appropriate value. The options are as follows:
 
 ```
   NAME - DESCRIPTION
+
+  STANDARD OPTIONS
+  ****************
+
   network1 - The .gexf or .net file describing the first network that is to 
              be aligned.
   network2 - The .gexf or .net file describing the second network that is to 
              be aligned.
-  sigs1 - The .sig.gz file containing the precomputed signatures for network1.
-  sigs2 - The .sig.gz file containing the precomputed signatures for network2.
   sequencescores - The .evalues file containing the precomputed BLAST evalues.
-  distFile - The .sdf file containing the precomputed distances.
-  alignFile - The .af file containing the precomputed alignment.
-  processors - The positive integer value for the number of processors to use. 
-               If this is not set, GHOST will automatically generate what 
-               should be the optimal value.
   hops - The positive integer value for the radius of the subgraphs. The 
          default value is 4.
+  nneighbors - The positive integer value for the number of nearest neighbors
+               in H that each node in G will have a distance computed to.
+               The default value is "all" which is coded as -1.
+  searchiter - The positive integer value for the number of local search
+               iterations that should be performed after the initial alignment
+               is complete. The process will terminate early if the last loop
+               yielded no changes. The default value is 10.
   alpha - The positive decimal value for the weight of the BLAST evalues in 
           the distance function. The value should be between 0 and 1 and be 
           written in decimal format (ex. 0.5). If no user-suggested alpha is 
@@ -112,10 +116,17 @@ appropriate value. The options that can be set are as follows:
           during the local-searh phase of the alignment algorithm. This is
           equivalent to the "budget" parameter described in the GHOST paper.
           The default value is 8.0.
-  searchiter - The positive integer value for the number of local search
-               iterations that should be performed after the initial alignment
-               is complete. The process will terminate early if the last loop
-               yielded no changes. The default value is 10.
+  processors - The positive integer value for the number of processors to use. 
+               If this is not set, GHOST will automatically generate what 
+               should be the optimal value.
+
+  PRECOMPUTATION OPTIONS
+  **********************
+
+  sigs1 - The .sig.gz file containing the precomputed signatures for network1.
+  sigs2 - The .sig.gz file containing the precomputed signatures for network2
+  distFile - The .sdf file containing the precomputed distances.
+  alignFile - The .af file containing the precomputed alignment.
   dumpSignatures - The boolean value (true or false) for whether you want the 
                    computation to stop after computing the signatures. Note 
                    that the boolean values are lower case. The default value 
@@ -124,9 +135,23 @@ appropriate value. The options that can be set are as follows:
                   computation to stop after computing the distances. Note that 
                   the boolean values are lower case. The default value is false.
 
+  EXTRA FUNCTIONALITY OPTIONS
+  ***************************
+  
+  directed - The boolean value (true or false) for whether the graph inputted
+             is directed or not. *has not been tested yet* Default value is
+             false.
+  seedSkip - The positive decimal value for the percent chance GHOST has to
+             temporarily skip a seed. Used to measure confidence of matchings.
+             Default value is 0.
+  sigApprox - The string for the name of the signature approximation method
+              you want to use. The choices are "rayleigh" and "inverseIter".
+              "rayleigh" should be about as twice as fast with some loss in 
+              performance. "inverseIter" is slower and worse, but is included
+              nonetheless.
 ```
 
-The extension associated with this format is `.cfg`.
+The extension associated with this format is ".cfg".
 
 Graph File Format (gexf)
 ------------------------
@@ -139,15 +164,25 @@ The extension associated with this format is `.gexf`.
 Graph File Format (net)
 -----------------------
 
-GHOST can also use the `.net` format which is composed of |E| lines of the
-form:
+GHOST can also use the .net format which is composed of |1+V+E| where the first line has the number of verticies and edges:
 
 ```
-  v1 v2
+  |V| |E|
 ```
 
-where v1 and v2 are verticies in the graph. The extension associated with this
-format is `.net`.
+The next ```|V|``` lines are of the form:
+
+```
+  a
+```
+
+where v is the name of the next vertex, and the last ```|E|``` lines are of the form:
+
+```
+  a b
+```
+
+where a and b are verticies in the graph. The extension associated with this format is ".net".
 
 Alignment File Format
 ---------------------

@@ -13,6 +13,8 @@ using std::vector;
 typedef boost::unordered_set<string> vlist;
 typedef boost::unordered_map<string, vlist> adjacencyMap;
 
+// adjacency list representation
+// multiples of the same edge not allowed
 class Graph
 {
   adjacencyMap m;

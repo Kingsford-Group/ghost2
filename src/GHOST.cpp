@@ -8,13 +8,15 @@
 #include "computeSpectralSignatures.hpp"
 #include "blastDistance.hpp"
 #include "spectralToDistance.hpp"
+#include "writeAlternateDistances.hpp"
 #include "alignGraphs.hpp"
 #include "localImprove.hpp"
-//#include "localImprove2.hpp"
 
 using std::string;
 using std::cout;
 
+// reads from a previously existing alignment
+// that is to be improved
 bmap readAlignment(string file)
 {
   bmap result;
@@ -44,21 +46,10 @@ bmap readAlignment(string file)
   return result;
 }
 
-void printMap2(vector<D_alpha> &f, string filename)
-{
-  ofstream fout (filename);
-  auto iter = f.begin(),
-  iend = f.end();
-  for(; iter != iend; ++iter)
-  {
-    fout << iter->get_n1() << "\t" << iter->get_n2() << "\n";
-  }
-  fout.close();
-}
-
+// computes the alignment giving the configuration data
 void computeAlignment(ConfigData c)
 {
-  // read in graph
+  // read in graphs
   Graph G,H;
   if(c.Ggraph.substr(c.Ggraph.size()-5) == ".gexf")
     G = readFromGexf(c.Ggraph, c.directed);
@@ -72,6 +63,7 @@ void computeAlignment(ConfigData c)
     H = readFromNet(c.Hgraph, c.directed);
   else {cout << "bad extension: " << c.Hgraph << "\n"; exit(0);}
 
+  // if all but localImprove already done, skip to localImprove
   if(c.AlignFile != "")
   {
     bmap align = readAlignment(c.AlignFile);
@@ -84,89 +76,79 @@ void computeAlignment(ConfigData c)
       else
         *evals = getBlastMap(c.SeqScores);
       localImprove(G, H, evals, &align, c.searchiter, c.ratio, c.numProcessors);
-      //localImprove2(G, H, &align, c.searchiter, c.numProcessors);
       printICS(G, H, align);
+      delete evals;
     }
     return;
   }
 
-/*bmap f2 = alignQ(G, H);
-  printICS(G, H, f2);
-  localImprove(G, H, NULL, &f2, c.searchiter, c.ratio, c.numProcessors);
-  if(c.searchiter != 0)printICS(G, H, f2);
-  printMap(f2, G.getName(), H.getName());
-  return;*/
-
-  vector<D_alpha> dist;
-
-  if(c.DistFile == ""){
-  // compute spectral signatures
-  if(c.Gsigs == "")
+  // if user wants to generate the alternate dists, do so here
+  if(c.alternateDistances)
   {
-    computeSpectralSignatures(&G, c.hops, c.numProcessors);
-    c.Gsigs = (G.getName() + ".sig.gz");
+    writeAlternateDistances(&G, &H);
+    c.DistFile=G.getName()+"_vs_"+H.getName()+".df";
   }
   else
   {
-    unsigned start = c.Gsigs.find_last_of("/");
-    if(start == string::npos) start = -1;
-    string name = c.Gsigs.substr(start+1);
-    if(name != (G.getName() + ".sig.gz"))
+    // compute spectral signatures of both graphs
+    if(c.Gsigs == "")
     {
-      cout << "file: " << c.Gsigs << " does match the network file name.\n" <<
-      "please correct before continuing.";
-      exit(0);
+      computeSpectralSignatures(&G, c.hops, c.numProcessors, c.SigApprox);
+      c.Gsigs = (G.getName() + ".sig.gz");
     }
-  }
-  if(c.Hsigs == "")
-  {
-    computeSpectralSignatures(&H, c.hops, c.numProcessors);
-    c.Hsigs = (H.getName() + ".sig.gz");
-  }
-  else 
-  {
-    unsigned start = c.Hsigs.find_last_of("/");
-    if(start == string::npos) start = -1;
-    string name = c.Hsigs.substr(start+1);
-    if(name != (H.getName() + ".sig.gz"))
+    else
     {
-      cout << "file: " << c.Hsigs << " does match the network file name.\n" <<
-      "please correct before continuing.";
-      exit(0);
+      unsigned start = c.Gsigs.find_last_of("/");
+      if(start == string::npos) start = -1;
+      string name = c.Gsigs.substr(start+1);
+      if(name != (G.getName() + ".sig.gz"))
+      {
+        cout << "file: " << c.Gsigs << " does match the network file name.\n" <<
+        "please correct before continuing.";
+        exit(0);
+      }
     }
+    if(c.Hsigs == "")
+    {
+      computeSpectralSignatures(&H, c.hops, c.numProcessors, c.SigApprox);
+      c.Hsigs = (H.getName() + ".sig.gz");
+    }
+    else 
+    {
+      unsigned start = c.Hsigs.find_last_of("/");
+      if(start == string::npos) start = -1;
+      string name = c.Hsigs.substr(start+1);
+      if(name != (H.getName() + ".sig.gz"))
+      {
+        cout << "file: " << c.Hsigs << " does match the network file name.\n" <<
+        "please correct before continuing.";
+        exit(0);
+      }
+    }
+    if(c.dumpSignatures) return;
   }
 
-  if(c.dumpSignatures) return; // if user only wanted sigs
-  }
-
-  // undirect for later steps
+  // undirected for second half
   G.direct(false); H.direct(false);
 
-  // get evalues if given
+  // read in evals
   blastMap *evals = new blastMap;
   if(c.SeqScores == "")
     evals = NULL;
   else
     *evals = getBlastMap(c.SeqScores);
 
-  if(c.DistFile == ""){
-  // compute distances
-  dist = 
-    getDistances(c.Gsigs, c.Hsigs, (G.getName()+"_vs_"+H.getName()+".sdf"), 
+  // generate distances
+  vector<D_alpha> dist;
+  if(c.DistFile == "")
+  {
+    dist = 
+      getDistances(c.Gsigs, c.Hsigs, (G.getName()+"_vs_"+H.getName()+".sdf"), 
                  c.alpha, c.beta, evals , c.numProcessors);
-  // if user wanted just the distances...
-  if(c.dumpDistances) { delete evals; return; }
-  }else{
-    dist = getDistancesFromFile(c.DistFile, c.alpha, c.beta, evals);
+    if(c.dumpDistances) { delete evals; return; }
   }
-
- /* cout << "starting alignment\n";
-  vector<D_alpha> ans = performMatching(dist);
-  cout << "done, writing results\n";
-  string file = G.getName() + "_vs_" + H.getName() + ".af";
-  printMap2(ans, file);
-  bmap align = readAlignment(file);
-  printICS(G, H, align);*/
+  else
+    dist = getDistancesFromFile(c.DistFile, c.alpha, c.beta, evals);
 
   // align graphs
   bmap f = alignGraphs(G, H, dist, c.nneighbors, c.seedSkip);

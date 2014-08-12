@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <tgmath.h>
 #include "swapEndian.hpp"
+#include <boost/unordered_map.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/device/file_descriptor.hpp>
@@ -18,6 +19,7 @@ using std::string;
 using std::istream;
 using std::ofstream;
 using std::ostringstream;
+using std::cout;
 
 //Fancy fast pow2 function from fastonebigheader.h
 static inline float fastpow2 (float p)
@@ -139,11 +141,12 @@ spectramap loadSigs(string file)
 
       int spectrumSize = readInt(in);
 
-      for(int k=0; k < spectrumSize; k++){
+      for(int k=0; k < spectrumSize; k++)
         spectrum.push_back(readDouble(in));
-      }
+
       double density = readDouble(in);
-      LevelInfo m(vnames,spectrum,density,ipsenMikhailovVector(&spectrum[0], spectrum.size(), .005));
+      LevelInfo m(vnames,spectrum,density,
+                  ipsenMikhailovVector(&spectrum[0], spectrum.size(), .005));
       levels.push_back(m);
     }
     map[vname] = levels;

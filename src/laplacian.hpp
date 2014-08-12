@@ -64,6 +64,7 @@ void AdjacencyMatrix::extend(Graph *input, string source)
       }
   }
   prev = next;
+
   nvert = nodes.size();
   m.resize(nvert,nvert);
 
@@ -101,7 +102,6 @@ vector<double> AdjacencyMatrix::getEigen()
     return v;
   SelfAdjointEigenSolver<MatrixXd> es(m, EigenvaluesOnly);
   VectorXd evals = es.eigenvalues();
-//  VectorXd evals = m.selfadjointView<Eigen::Upper>().eigenvalues();
   for(int i=0; i<evals.rows(); i++)
     v.push_back(evals(i));
   return v;
@@ -110,8 +110,9 @@ vector<double> AdjacencyMatrix::getEigen()
 vector<double> AdjacencyMatrix::rayleighEigen()
 {
   vector<double> result;
-  return result;
-  int tries = 30;
+//  int tries = m.rows()/2;
+//  if(tries<1) tries=1;
+  int tries = 10;
   for(int i=0;i<tries;i++)
   {
     double d = rayleigh(&m);
@@ -121,6 +122,7 @@ vector<double> AdjacencyMatrix::rayleighEigen()
         found=true;
     if(!found) result.push_back(d);
   }
+  if(result.size()==0) cout << "whut?\n";
   return result;
 }
 
@@ -128,7 +130,7 @@ vector<double> AdjacencyMatrix::rayleighEigen()
 vector<double> AdjacencyMatrix::inverseEigen()
 {
   vector<double> result;
-  int tries = 10;
+  int tries = 2;
   double mu = 1.0/(tries+1);
   for(int i=1;i<=tries;i++)
   {

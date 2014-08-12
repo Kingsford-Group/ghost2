@@ -4,6 +4,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <math.h>
 #include <tgmath.h>
 #include <stdlib.h>
 

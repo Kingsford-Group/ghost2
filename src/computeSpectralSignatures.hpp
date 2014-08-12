@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stdlib.h>
 #include <string>
 #include <vector>
 #include <boost/unordered_map.hpp>
@@ -11,10 +12,13 @@
 #include <boost/thread.hpp>
 #include "threadpool.hpp"
 
+using std::cout;
 using boost::threadpool::pool;
 typedef boost::posix_time::microsec_clock bclock;
 typedef boost::posix_time::ptime ptime;
 
+// all three functions compute the spectrum to use
+// first is exact, other two are approximations
 void spectrum(Graph *input, int numHops, string source, 
               vector<LevelData> *output, ProgressBar *p)
 {
@@ -23,13 +27,39 @@ void spectrum(Graph *input, int numHops, string source,
   {
     m.extend(input, source);
     (*output).push_back(LevelData(m.getPrev(), m.getEigen(), m.getDensity()));
-//    (*output).push_back(LevelData(m.getPrev(), m.rayleighEigen(), m.getDensity()));
-//    (*output).push_back(LevelData(m.getPrev(), m.inverseEigen(), m.getDensity()));
   }
   (*p).update();
 }
 
-void computeSpectralSignatures(Graph *input, int numHops, int numP)
+void spectrumR(Graph *input, int numHops, string source, 
+              vector<LevelData> *output, ProgressBar *p)
+{
+  AdjacencyMatrix m;
+  for(int i=1;i<=numHops;i++)
+  {
+    m.extend(input, source);
+    (*output).push_back(LevelData(m.getPrev(), m.rayleighEigen(), 
+                                  m.getDensity()));
+  }
+  (*p).update();
+}
+
+void spectrumI(Graph *input, int numHops, string source, 
+              vector<LevelData> *output, ProgressBar *p)
+{
+  AdjacencyMatrix m;
+  for(int i=1;i<=numHops;i++)
+  {
+    m.extend(input, source);
+    (*output).push_back(LevelData(m.getPrev(), m.inverseEigen(), 
+                                  m.getDensity()));
+  }
+  (*p).update();
+}
+
+// uses graph to generate spectrums of induced subgraphs
+// of a radius 1-#hops from every possible source node
+void computeSpectralSignatures(Graph *input, int numHops, int numP, string mode)
 {
   ptime t = bclock::local_time();
   if(numP < 1) numP = boost::thread::hardware_concurrency();
@@ -46,10 +76,26 @@ void computeSpectralSignatures(Graph *input, int numHops, int numP)
   levelMap levelmap;
   vector< vector<LevelData> > data;
   data.resize(numNodes);
-  for(int i=0;i<numNodes;i++)
-    tpool.schedule(
-      boost::bind(&spectrum, input, numHops, nodes[i], &(data[i]), &p)
-    );
+  if(mode=="")
+    for(int i=0;i<numNodes;i++)
+      tpool.schedule(
+        boost::bind(&spectrum, input, numHops, nodes[i], &(data[i]), &p)
+      );
+  else if(mode=="rayleigh")
+    for(int i=0;i<numNodes;i++)
+      tpool.schedule(
+        boost::bind(&spectrumR, input, numHops, nodes[i], &(data[i]), &p)
+      );
+  else if(mode=="inverseIter")
+    for(int i=0;i<numNodes;i++)
+      tpool.schedule(
+        boost::bind(&spectrumI, input, numHops, nodes[i], &(data[i]), &p)
+      );
+  else
+  {
+    cout << "sigApprox should be either rayleigh or inverseIter\n";
+    exit(0);
+  }
   tpool.wait();
   cout << "\n";
 

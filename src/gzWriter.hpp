@@ -25,6 +25,7 @@ struct LevelData
 
 typedef boost::unordered_map<string, vector<LevelData> > levelMap;
 
+// writes the data so its backwards compatible
 class GzWriter
 {
   io::filtering_ostream out;
