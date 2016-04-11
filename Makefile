@@ -5,7 +5,7 @@ HEADERS = $(wildcard src/*.hpp)
 
 BOOSTDIR ?= /usr/local/include
 BOOSTLIB ?= /usr/local/lib
-LFLAGS = -lboost_iostreams -lboost_system -lboost_thread -lpthread
+LFLAGS = -lboost_iostreams -lboost_system -lboost_thread -lpthread -lz -lrt
 INCLUDES = -I include -I $(BOOSTDIR) -L $(BOOSTLIB) $(LFLAGS)
 
 GHOST: src/GHOST.cpp $(HEADERS)
