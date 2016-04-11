@@ -82,55 +82,6 @@ void computeAlignment(ConfigData c)
     return;
   }
 
-  // if user wants to generate the alternate dists, do so here
-  if(c.alternateDistances)
-  {
-    writeAlternateDistances(&G, &H);
-    c.DistFile=G.getName()+"_vs_"+H.getName()+".df";
-  }
-  else
-  {
-    // compute spectral signatures of both graphs
-    if(c.Gsigs == "")
-    {
-      computeSpectralSignatures(&G, c.hops, c.numProcessors, c.SigApprox);
-      c.Gsigs = (G.getName() + ".sig.gz");
-    }
-    else
-    {
-      unsigned start = c.Gsigs.find_last_of("/");
-      if(start == string::npos) start = -1;
-      string name = c.Gsigs.substr(start+1);
-      if(name != (G.getName() + ".sig.gz"))
-      {
-        cout << "file: " << c.Gsigs << " does match the network file name.\n" <<
-        "please correct before continuing.";
-        exit(0);
-      }
-    }
-    if(c.Hsigs == "")
-    {
-      computeSpectralSignatures(&H, c.hops, c.numProcessors, c.SigApprox);
-      c.Hsigs = (H.getName() + ".sig.gz");
-    }
-    else 
-    {
-      unsigned start = c.Hsigs.find_last_of("/");
-      if(start == string::npos) start = -1;
-      string name = c.Hsigs.substr(start+1);
-      if(name != (H.getName() + ".sig.gz"))
-      {
-        cout << "file: " << c.Hsigs << " does match the network file name.\n" <<
-        "please correct before continuing.";
-        exit(0);
-      }
-    }
-    if(c.dumpSignatures) return;
-  }
-
-  // undirected for second half
-  G.direct(false); H.direct(false);
-
   // read in evals
   blastMap *evals = new blastMap;
   if(c.SeqScores == "")
@@ -142,13 +93,62 @@ void computeAlignment(ConfigData c)
   vector<D_alpha> dist;
   if(c.DistFile == "")
   {
-    dist = 
-      getDistances(c.Gsigs, c.Hsigs, (G.getName()+"_vs_"+H.getName()+".sdf"), 
-                 c.alpha, c.beta, evals , c.numProcessors);
-    if(c.dumpDistances) { delete evals; return; }
+      // if user wants to generate the alternate dists, do so here
+      if(c.alternateDistances)
+      {
+        writeAlternateDistances(&G, &H);
+        c.DistFile=G.getName()+"_vs_"+H.getName()+".df";
+      }
+      else
+      {
+        // compute spectral signatures of both graphs
+        if(c.Gsigs == "")
+        {
+          computeSpectralSignatures(&G, c.hops, c.numProcessors, c.SigApprox);
+          c.Gsigs = (G.getName() + ".sig.gz");
+        }
+        else
+        {
+          unsigned start = c.Gsigs.find_last_of("/");
+          if(start == string::npos) start = -1;
+          string name = c.Gsigs.substr(start+1);
+          if(name != (G.getName() + ".sig.gz"))
+          {
+            cout << "file: " << c.Gsigs << " does match the network file name.\n" <<
+            "please correct before continuing.";
+            exit(0);
+          }
+        }
+        if(c.Hsigs == "")
+        {
+          computeSpectralSignatures(&H, c.hops, c.numProcessors, c.SigApprox);
+          c.Hsigs = (H.getName() + ".sig.gz");
+        }
+        else
+        {
+          unsigned start = c.Hsigs.find_last_of("/");
+          if(start == string::npos) start = -1;
+          string name = c.Hsigs.substr(start+1);
+          if(name != (H.getName() + ".sig.gz"))
+          {
+            cout << "file: " << c.Hsigs << " does match the network file name.\n" <<
+            "please correct before continuing.";
+            exit(0);
+          }
+        }
+        if(c.dumpSignatures) return;
+      }
+
+      // undirected for second half
+      G.direct(false); H.direct(false);
+
+      dist =
+          getDistances(c.Gsigs, c.Hsigs, (G.getName()+"_vs_"+H.getName()+".sdf"),
+                  c.alpha, c.beta, evals , c.numProcessors);
+      if(c.dumpDistances) { delete evals; return; }
   }
   else
-    dist = getDistancesFromFile(c.DistFile, c.alpha, c.beta, evals);
+      dist = getDistancesFromFile(c.DistFile, c.alpha, c.beta, evals);
 
   // align graphs
   bmap f = alignGraphs(G, H, dist, c.nneighbors, c.seedSkip);
@@ -165,8 +165,8 @@ int main(int argc, char** argv)
   // read in options
   for(int i=1; i<argc; i++)
   {
-    if(string(argv[i]) == "-c") 
-      if((i+1)<argc) 
+    if(string(argv[i]) == "-c")
+      if((i+1)<argc)
         c.configure(string(argv[i+1]));
     if(string(argv[i]) == "-k")
       if((i+1)<argc)

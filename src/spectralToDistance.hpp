@@ -34,7 +34,7 @@ static inline float fastlog2 (float x)
   float y = vx.i;
   y *= 1.1920928955078125e-7f;
   return y - 124.22551499f
-           - 1.498030302f * mx.f 
+           - 1.498030302f * mx.f
            - 1.72587999f / (0.3520887068f + mx.f);
 }
 int min(int a, int b){return a<b?a:b;}
@@ -52,7 +52,7 @@ double klDiv(double *p1, double *p2, int count)
 double jsDist(double *p1, double *p2, int s)
 {
   double avg[s];
-  for(int i = 0; i < s; i++) 
+  for(int i = 0; i < s; i++)
     avg[i] = .5 * (p1[i] + p2[i]);
   return sqrt(.5 * klDiv(p1, avg, s) + .5 * klDiv(p2, avg, s));
 }
@@ -61,13 +61,13 @@ double DTopo(LevelInfo *v1, LevelInfo *v2, int s)
 {
   double dist = 0;
   for(int i = 0; i < s; i++)
-    dist += jsDist(&(v1[i].signature)[0], &(v2[i].signature)[0], 
+    dist += jsDist(&(v1[i].signature)[0], &(v2[i].signature)[0],
         min(v1[i].signature.size(), v2[i].signature.size()));
   return dist/s;
 }
 
 //Calculates the D_alphas from node n to all nodes in m2
-void distanceWorker(spectramap::value_type n, spectramap* m2, 
+void distanceWorker(spectramap::value_type n, spectramap* m2,
     D_alpha** result, string* out, ProgressBar *pbar)
 {
   auto end = m2->end();
@@ -116,7 +116,7 @@ void applyAlpha(double a, double b, vector<D_alpha> *scores, blastmap* blastscor
     if(maxheap.size() == 0) a = 1;
     else {
       double seqval = maxheap.front();
-      a = seqval/structval;
+      a = seqval / (seqval + structval);
     }
   }
 
@@ -141,19 +141,19 @@ void applyAlpha(double a, double b, vector<D_alpha> *scores, blastmap* blastscor
 }
 
 //Calculates and writes all D_topo values from the given spectral signature files
-//Returns 
+//Returns
 vector<D_alpha> getDistances(string file1, string file2, string outputname, double a, double b, blastmap* blastscores, int numP)
 {
   ptime t = bclock::local_time();
   cout << "loading sigs file: " << file1 << "\n";
   spectramap m1 = loadSigs(file1);
-  cout << "loaded " << m1.size() << " vertices in " << 
+  cout << "loaded " << m1.size() << " vertices in " <<
     (bclock::local_time() - t).total_milliseconds() << "ms\n";
 
   t = bclock::local_time();
   cout << "loading sigs file: " << file2 << "\n";
   spectramap m2 = loadSigs(file2);
-  cout << "loaded " << m2.size() << " vertices in " << 
+  cout << "loaded " << m2.size() << " vertices in " <<
     (bclock::local_time() - t).total_milliseconds() << "ms\n";
 
   ofstream out(outputname.c_str());
@@ -171,12 +171,12 @@ vector<D_alpha> getDistances(string file1, string file2, string outputname, doub
   for(spectramap::iterator it1 = m1.begin(); it1 != m1.end(); ++it1){
     results.push_back(new D_alpha*[m2.size()]);
     outputs.push_back(new string);
-    threads.schedule(boost::bind(&distanceWorker, *it1, &m2, results.back(), 
+    threads.schedule(boost::bind(&distanceWorker, *it1, &m2, results.back(),
         outputs.back(), &pbar));
   }
 
   threads.wait();
-  cout << "\nfinished calculating " << (m1.size()*m2.size()) << " distances in " << 
+  cout << "\nfinished calculating " << (m1.size()*m2.size()) << " distances in " <<
     (bclock::local_time()-t).total_seconds() << "s\n";
 
   vector<D_alpha> allDistances;
